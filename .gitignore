@@ -1,0 +1,5 @@
+build.sh
+game
+game-nogl
+*.o
+*.sw*
