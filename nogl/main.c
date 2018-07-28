@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
-//#include "tile.h"
+#include "tile.h"
+#include "point.h"
 
 
-//static Tile *tile = NULL;
-//static Point3 pos;
+static Tile *tile = NULL;
+static Point3i pos;
 
 bool init()
 {
@@ -13,21 +14,20 @@ bool init()
 		printf("SDL couldn't init! SDL_Error: %s\n", SDL_GetError());
 		return false;
 	}
-/*
+
 	pos.x = 1;
 	pos.y = 2;
 	pos.z = 3;
 
-	tile = tile_init(pos, Terrain.D_WATER);
+	tile = tile_init(pos, D_WATER);
 
 	pos.x = pos.y = pos.z = 0;
-	pos = tile_position(t);
+	pos = tile_position(tile);
 
 	if(tile == NULL){
 		printf("ERROR: tile null!");
 		return false;
 	}
-*/
 	return true;
 }
 
@@ -42,10 +42,8 @@ int main()
 	Uint32 ctime = 0;
 	int i = 0;
 
-/*
-	printf("Tile pos - (%d,%d,%d), ter - %d",
-			pos.x, pos.y, pos.z, tile_terrain(t));
-*/
+	printf("Tile pos - (%d,%d,%d), ter - %d\n",
+			pos.x, pos.y, pos.z, tile_terrain(tile));
 	strcpy(str, "Hello... |");
 	strcpy(rot, "|/-\\");
 	printf("%s", str);
