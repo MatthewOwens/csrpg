@@ -45,6 +45,7 @@ int main()
 				printf("#");
 			}
 		}
+		printf("\n");
 	}
 
 	strcpy(str, "Hello... |");
