@@ -13,4 +13,12 @@ typedef struct { int w, x, y , z; } Point4i;
 typedef struct { float x, y; } Point2f;
 typedef struct { float x, y, z; } Point3f;
 typedef struct { float w, x, y, z; } Point4f;
+
+Point2i point2i(int x, int y);
+Point3i point3i(int x, int y, int z);
+Point4i point4i(int w, int x, int y, int z);
+
+Point2f point2f(float x, float y);
+Point3f point3f(float x, float y, float z);
+Point4f point4f(float w, float x, float y, float z);
 #endif//POINT_H
