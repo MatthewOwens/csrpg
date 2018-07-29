@@ -34,10 +34,10 @@ int main()
 	Point2i loc;
 	Tile* sel = NULL;
 
-	for(int i = 0; i < 5; ++i){
-		for(int j = 0; j < 3; ++j){
-			loc.x = i;
-			loc.y = j;
+	for(int x = 0; x < 5; ++x){
+		for(int y = 0; y < 3; ++y){
+			loc.x = x;
+			loc.y = y;
 			sel = board_tile_at(board, loc);
 			if(sel == NULL){
 				printf("N");

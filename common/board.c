@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 typedef struct {
-	Tile ***tiles;
+	Tile **tiles;
 	Point2i dimensions;
 } Board_t;
 
@@ -16,10 +16,17 @@ Board *board_init(int sizex, int sizey)
 	b->dimensions.y = sizey;
 	b->tiles = malloc(sizet * sizeof(Tile));
 
+	//for(int x = 0; x < sizex; ++x){
+	//	b->tiles[x] = malloc(sizey * sizeof(Tile));
+	//	for(int y = 0; y < sizey; ++y){
+	//		b->tiles[x][y] = tile_init(point3i(x,y,1), PLAINS);
+	//	}
+	//}
 	for(int x = 0; x < sizex; ++x){
-		b->tiles[x] = malloc(sizey * sizeof(Tile));
 		for(int y = 0; y < sizey; ++y){
-			b->tiles[x][y] = tile_init(point3i(x,y,1), PLAINS);
+
+			b->tiles[x + (y * sizey)] =
+			tile_init(point3i(x,y,1), PLAINS);
 		}
 	}
 
@@ -33,7 +40,7 @@ void board_cleanup(Board *b)
 
 	for(int i = 0; i < bt->dimensions.x; ++i){
 		for(int j = 0; j < bt->dimensions.y; ++j){
-			tile_cleanup(bt->tiles[i][j]);
+			tile_cleanup(bt->tiles[i + (j*bt->dimensions.y)]);
 		}
 	}
 
@@ -51,5 +58,5 @@ Tile* board_tile_at(Board* b, Point2i point)
 		return NULL;
 	}
 
-	return bt->tiles[point.x][point.y];
+	return bt->tiles[point.x + (point.y * bt->dimensions.y)];
 }
