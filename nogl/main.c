@@ -34,13 +34,13 @@ int main()
 	Point2i loc;
 	Tile* sel = NULL;
 
-	for(int x = 0; x < 5; ++x){
-		for(int y = 0; y < 3; ++y){
+	for(int y = 0; y < 3; ++y){
+		for(int x = 0; x < 5; ++x){
 			loc.x = x;
 			loc.y = y;
 			sel = board_tile_at(board, loc);
 			if(sel == NULL){
-				printf("N");
+				printf("X");
 			} else {
 				printf("#");
 			}

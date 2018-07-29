@@ -16,16 +16,10 @@ Board *board_init(int sizex, int sizey)
 	b->dimensions.y = sizey;
 	b->tiles = malloc(sizet * sizeof(Tile));
 
-	//for(int x = 0; x < sizex; ++x){
-	//	b->tiles[x] = malloc(sizey * sizeof(Tile));
-	//	for(int y = 0; y < sizey; ++y){
-	//		b->tiles[x][y] = tile_init(point3i(x,y,1), PLAINS);
-	//	}
-	//}
 	for(int x = 0; x < sizex; ++x){
 		for(int y = 0; y < sizey; ++y){
 
-			b->tiles[x + (y * sizey)] =
+			b->tiles[y * sizex + x] =
 			tile_init(point3i(x,y,1), PLAINS);
 		}
 	}
