@@ -22,12 +22,12 @@ void tile_cleanup(Tile *t)
 
 Point3i tile_position(Tile *t)
 {
-	Tile_t *tt = (Tile *) t;
+	Tile_t *tt = (Tile_t *) t;
 	return tt->position;
 }
 
 enum Terrain tile_terrain(Tile *t)
 {
-	Tile_t *tt = (Tile *) t;
+	Tile_t *tt = (Tile_t *) t;
 	return tt->terrain;
 }
