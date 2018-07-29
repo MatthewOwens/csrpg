@@ -23,6 +23,7 @@ Board *board_init(int sizex, int sizey)
 		}
 	}
 
+	ret = (Board *) b;
 	return ret;
 }
 
