@@ -15,7 +15,7 @@ bool init()
 
 	board = board_init(5,3);
 	if(board == NULL){
-		printf("ERROR: board null!");
+		printf("ERROR: board null!\n");
 		return false;
 	}
 	return true;
