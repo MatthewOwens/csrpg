@@ -42,10 +42,12 @@ int main()
 	for(int y = 0; y < bsize.y; ++y){
 		for(int x = 0; x < bsize.x; ++x){
 			loc = point2i(x,y);
-			elevation[y * bsize.x + x] = board_elevation_at(board, loc) + '0';
 			//if(elevation[y * bsize.x + x] != 1){
 			if(board_elevation_at(board, loc) != 1){
 				printf("elevation error at (%d,%d)\n", loc.x, loc.y);
+				elevation[y * bsize.x + x] = '?';
+			} else {
+				elevation[y * bsize.x + x] = board_elevation_at(board, loc) + '0';
 			}
 			if(board_terrain_at(board, loc) == IMPASSABLE){
 				terrain[y * bsize.x + x] = 'X';
