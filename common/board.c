@@ -8,22 +8,28 @@ typedef struct {
 	Point2i dimensions;
 } Board_t;
 
+int flatten(Point2i coord, Point2i size)
+{
+	return coord.x + (size.x * coord.y);
+}
+
 Board *board_init(Point2i size)
 {
 	Board *ret = NULL;
 	Board_t *b = malloc(sizeof(Board_t));
-	int sizet = size.x * size.y;
+	int itr;
 
 	b->dimensions.x = size.x;
 	b->dimensions.y = size.y;
-	b->tiles = malloc(sizet * sizeof(Tile));
+	b->tiles = malloc(size.x * size.y * sizeof(Tile));
 
-	for(int x = 0; x < size.x; ++x){
-		for(int y = 0; y < size.y; ++y){
-
-			b->tiles[y * size.x + x] =
-			tile_init(point3i(x,y,1), PLAINS);
+	for(int y = 0; y < size.y; ++y){
+		for(int x = 0; x < size.x; ++x){
+			itr = flatten(point2i(x, y), size);
+			printf("%d\t", itr);
+			b->tiles[itr] = tile_init(point3i(x, y, itr), PLAIN);
 		}
+		printf("\n");
 	}
 
 	ret = (Board *) b;

@@ -11,4 +11,5 @@ Point2i board_get_size(Board* b, const char *why);
 
 enum Terrain board_terrain_at(Board* b, Point2i point);
 int board_elevation_at(Board* b, Point2i point);
+Tile* board_tile_at(Board* b, Point2i point);
 #endif//BOARD_H
