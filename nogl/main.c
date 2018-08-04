@@ -3,7 +3,7 @@
 #include <SDL2/SDL.h>
 #include "board.h"
 #include "point.h"
-#include "ncurses.h"
+#include <ncurses.h>
 
 static Board* board = NULL;
 
@@ -14,8 +14,27 @@ bool init()
 		return false;
 	}
 
-	//initscr();
+	initscr();
 	return true;
+}
+
+void draw_borders()
+{
+	char c = 'X';
+
+	for(int i = 0; i < 80; ++i){
+		mvaddch(0, i, c);
+		mvaddch(22, i, c);
+		mvaddch(24, i, c);
+	}
+
+	for(int i = 0; i < 25; ++i){
+		mvaddch(i, 0, c);
+		mvaddch(i, 79, c);
+	}
+
+	// updating the screen
+	refresh();
 }
 
 int main()
@@ -23,7 +42,7 @@ int main()
 	if(!init())
 		return -1;
 
-	board = board_init(point2i(5,3));
+	board = board_init(point2i(3,3));
 	if(board == NULL){
 		fprintf(stderr, "board null after init!\n");
 		return -1;
@@ -33,16 +52,39 @@ int main()
 	Uint32 ctime = 0;
 	Point2i loc;
 	Point2i bsize = board_get_size(board, "storing size");
-	Uint32 cclock = SDL_GetTicks();
-	Uint32 pclock = 0;
+	Uint32 cclock = 0;
+	Uint32 pclock = SDL_GetTicks();
 
-	// 'game' loop, only stays open for .5 seconds
-	while(ctime < itime + 500){
-		ctime = SDL_GetTicks();
+	char *reprs = malloc(bsize.x * bsize.y * sizeof(char));
+	char *elevs = malloc(bsize.x * bsize.y * sizeof(char));
+	char *sel = NULL;
+
+	for(int y = 0; y < bsize.y; ++y){
+		for(int x = 0; x < bsize.x; ++x){
+			elevs[x + (bsize.x * y)] =
+				board_elevation_at(board, point2i(x, y)) + '0';
+			reprs[x + (bsize.x * y)] =
+				tile_repr(board_terrain_at(board, point2i(x, y)));
+		}
 	}
 
+	draw_borders();
+
+	// 'game' loop, only stays open for 2 seconds
+	while(ctime < itime + 2000){
+		ctime = SDL_GetTicks();
+		cclock = SDL_GetTicks();
+		
+		// Switching the selection if needed
+		if(cclock > pclock + 500 || pclock == 0){
+			sel = (sel == reprs) ? elevs : reprs;
+			pclock = cclock;
+		}
+	}
+
+
 	SDL_Quit();
-	//endwin();
+	endwin();
 
 	return 0;
 }
