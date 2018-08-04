@@ -54,6 +54,7 @@ int main()
 	Point2i bsize = board_get_size(board, "storing size");
 	Uint32 cclock = 0;
 	Uint32 pclock = SDL_GetTicks();
+	Point2i rpos = point2i(10,10); // where to draw the arr
 
 	char *reprs = malloc(bsize.x * bsize.y * sizeof(char));
 	char *elevs = malloc(bsize.x * bsize.y * sizeof(char));
@@ -70,8 +71,8 @@ int main()
 
 	draw_borders();
 
-	// 'game' loop, only stays open for 2 seconds
-	while(ctime < itime + 2000){
+	// 'game' loop
+	while(ctime < itime + 5000){
 		ctime = SDL_GetTicks();
 		cclock = SDL_GetTicks();
 		
@@ -79,6 +80,13 @@ int main()
 		if(cclock > pclock + 500 || pclock == 0){
 			sel = (sel == reprs) ? elevs : reprs;
 			pclock = cclock;
+
+			for(int y = 0; y < bsize.y; ++y){
+				for(int x = 0; x < bsize.x; ++x){
+					mvaddch(y + rpos.y, x + rpos.x , sel[x + bsize.x * y]);
+				}
+			}
+			refresh();
 		}
 	}
 
