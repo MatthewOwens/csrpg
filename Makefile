@@ -30,7 +30,7 @@ $(GL_TARGET): $(COMMON_OBJECTS) $(GL_OBJECTS)
 	$(CC) $(COMMON_OBJECTS) $(GL_OBJECTS) -Wall $(LIBS) -o $@
 
 $(NOGL_TARGET): $(COMMON_OBJECTS) $(NOGL_OBJECTS)
-	$(CC) $(COMMON_OBJECTS) $(NOGL_OBJECTS) -Wall $(LIBS) -o $@
+	$(CC) $(COMMON_OBJECTS) $(NOGL_OBJECTS) -Wall $(NOGL_LIBS) -o $@
 
 common/%.o: common/%.c
 	$(CC) $(CFLAGS) -c $^ -o $@
