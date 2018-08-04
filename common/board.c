@@ -21,15 +21,13 @@ Board *board_init(Point2i size)
 
 	b->dimensions.x = size.x;
 	b->dimensions.y = size.y;
-	b->tiles = malloc(size.x * size.y * sizeof(Tile));
+	b->tiles = malloc(sizeof(Tile *) * size.x * size.y);
 
 	for(int y = 0; y < size.y; ++y){
 		for(int x = 0; x < size.x; ++x){
 			itr = flatten(point2i(x, y), size);
-			printf("%d\t", itr);
 			b->tiles[itr] = tile_init(point3i(x, y, itr), PLAIN);
 		}
-		printf("\n");
 	}
 
 	ret = (Board *) b;
