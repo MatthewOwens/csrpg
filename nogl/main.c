@@ -42,7 +42,7 @@ int main()
 	if(!init())
 		return -1;
 
-	board = board_init(point2i(3,3));
+	board = board_init(point2i(4,3));
 	if(board == NULL){
 		fprintf(stderr, "board null after init!\n");
 		return -1;
@@ -51,7 +51,7 @@ int main()
 	Uint32 itime = SDL_GetTicks();
 	Uint32 ctime = 0;
 	Point2i loc;
-	Point2i bsize = board_get_size(board, "storing size");
+	Point2i bsize = board_get_size(board);
 	Uint32 cclock = 0;
 	Uint32 pclock = SDL_GetTicks();
 	Point2i rpos = point2i(10,10); // where to draw the arr
