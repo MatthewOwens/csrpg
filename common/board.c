@@ -61,7 +61,7 @@ Tile* board_tile_at(Board* b, Point2i point)
 	Board_t *bt = (Board_t *) b;
 
 	if(is_point_valid(bt->dimensions, point)){
-		return bt->tiles[point.x + (point.y * bt->dimensions.y)];
+		return bt->tiles[ flatten(point, board_get_size(b)) ];
 	} else {
 		return NULL;
 	}
@@ -72,7 +72,7 @@ enum Terrain board_terrain_at(Board* b, Point2i point)
 	Board_t *bt = (Board_t *) b;
 
 	if(is_point_valid(bt->dimensions, point)){
-		return tile_terrain(bt->tiles[point.x + (point.y * bt->dimensions.y)]);
+		return tile_terrain(bt->tiles[flatten(point, board_get_size(b)) ]);
 	} else {
 		return IMPASSABLE;
 	}
@@ -85,17 +85,17 @@ int board_elevation_at(Board* b, Point2i point)
 		return -1;
 
 	if(is_point_valid(bt->dimensions, point)){
-		return tile_position(bt->tiles[point.x+(point.y*bt->dimensions.y)]).z;
+		return tile_position(bt->tiles[ flatten(point, board_get_size(b))]).z;
 	} else { 
 		return -1;
 	}
 }
 
-Point2i board_get_size(Board* b, const char *why)
+Point2i board_get_size(Board* b)
 {
 	Board_t *bt = (Board_t *) b;
 	if(b == NULL){
-		fprintf(stderr, "error getting board size to %s, board is NULL!", why);
+		fprintf(stderr, "error getting board size, board is NULL!");
 		return point2i(0,0);
 	} else {
 		return bt->dimensions;
