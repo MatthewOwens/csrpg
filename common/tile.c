@@ -7,6 +7,8 @@ typedef struct
 	enum Terrain terrain;
 } Tile_t;
 
+static const char repr[] = {'X', '.', '^', '\'', '~', '#', '*', '|', '0'};
+
 Tile *tile_init(Point3i pos, enum Terrain ter)
 {
 	Tile_t *t = malloc(sizeof(Tile_t));
@@ -22,12 +24,21 @@ void tile_cleanup(Tile *t)
 
 Point3i tile_position(Tile *t)
 {
-	Tile_t *tt = (Tile *) t;
+	Tile_t *tt = (Tile_t *) t;
 	return tt->position;
 }
 
 enum Terrain tile_terrain(Tile *t)
 {
-	Tile_t *tt = (Tile *) t;
+	Tile_t *tt = (Tile_t *) t;
 	return tt->terrain;
+}
+
+char tile_repr(enum Terrain t)
+{
+	if(t < 0 || t > LAST){
+		return '?';
+	} else {
+		return repr[t];
+	}
 }

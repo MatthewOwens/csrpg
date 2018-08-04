@@ -2,7 +2,7 @@ GL_TARGET = game
 LIBS = -lm -D_REENTRANT -lGL -lGLEW -lSDL2 -lSDL2_image
 
 NOGL_TARGET = game-nogl
-NOGL_LIBS = -lm -D_REENTRANT -lSDL2 -lSDL2_image
+NOGL_LIBS = -lm -D_REENTRANT -lSDL2 -lSDL2_image -lncurses
 
 CC = gcc
 CFLAGS = -g -Wall -I/usr/include/SDL2 -Icommon/ -Inogl/ -Igl/
@@ -30,16 +30,16 @@ $(GL_TARGET): $(COMMON_OBJECTS) $(GL_OBJECTS)
 	$(CC) $(COMMON_OBJECTS) $(GL_OBJECTS) -Wall $(LIBS) -o $@
 
 $(NOGL_TARGET): $(COMMON_OBJECTS) $(NOGL_OBJECTS)
-	$(CC) $(COMMON_OBJECTS) $(NOGL_OBJECTS) -Wall $(LIBS) -o $@
+	$(CC) $(COMMON_OBJECTS) $(NOGL_OBJECTS) -Wall $(NOGL_LIBS) -o $@
 
-common/%.o: $(COMMON_SRCS)
-	$(CC) $(CFLAGS) -c $< -o $@
+common/%.o: common/%.c
+	$(CC) $(CFLAGS) -c $^ -o $@
 
-nogl/%.o: $(NOGL_SRCS)
-	$(CC) $(CFLAGS) -c $< -o $@
+nogl/%.o: nogl/%.c
+	$(CC) $(CFLAGS) -c $^ -o $@
 
-gl/%.o: $(GL_SRCS)
-	$(CC) $(CFLAGS) -c $< -o $@
+gl/%.o: gl/%.c
+	$(CC) $(CFLAGS) -c $^ -o $@
 
 clean:
 	rm -f gl/*.o

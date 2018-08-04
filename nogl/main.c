@@ -1,12 +1,11 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
-#include "tile.h"
+#include "board.h"
 #include "point.h"
+#include <ncurses.h>
 
-
-static Tile *tile = NULL;
-static Point3i pos;
+static Board* board = NULL;
 
 bool init()
 {
@@ -15,20 +14,27 @@ bool init()
 		return false;
 	}
 
-	pos.x = 1;
-	pos.y = 2;
-	pos.z = 3;
-
-	tile = tile_init(pos, D_WATER);
-
-	pos.x = pos.y = pos.z = 0;
-	pos = tile_position(tile);
-
-	if(tile == NULL){
-		printf("ERROR: tile null!");
-		return false;
-	}
+	initscr();
 	return true;
+}
+
+void draw_borders()
+{
+	char c = 'X';
+
+	for(int i = 0; i < 80; ++i){
+		mvaddch(0, i, c);
+		mvaddch(22, i, c);
+		mvaddch(24, i, c);
+	}
+
+	for(int i = 0; i < 25; ++i){
+		mvaddch(i, 0, c);
+		mvaddch(i, 79, c);
+	}
+
+	// updating the screen
+	refresh();
 }
 
 int main()
@@ -36,31 +42,49 @@ int main()
 	if(!init())
 		return -1;
 
-	char *str = malloc(10);
-	char *rot = malloc(4);
+	board = board_init(point2i(3,3));
+	if(board == NULL){
+		fprintf(stderr, "board null after init!\n");
+		return -1;
+	}
+
 	Uint32 itime = SDL_GetTicks();
 	Uint32 ctime = 0;
-	int i = 0;
+	Point2i loc;
+	Point2i bsize = board_get_size(board, "storing size");
+	Uint32 cclock = 0;
+	Uint32 pclock = SDL_GetTicks();
 
-	printf("Tile pos - (%d,%d,%d), ter - %d\n",
-			pos.x, pos.y, pos.z, tile_terrain(tile));
-	strcpy(str, "Hello... |");
-	strcpy(rot, "|/-\\");
-	printf("%s", str);
+	char *reprs = malloc(bsize.x * bsize.y * sizeof(char));
+	char *elevs = malloc(bsize.x * bsize.y * sizeof(char));
+	char *sel = NULL;
 
-	while(itime < ctime + 2000){
-		str[9] = rot[i];
-		printf("\r%s", str);
-
-		++i;
-		if(i > 3) i = 0;
-		itime = SDL_GetTicks();
+	for(int y = 0; y < bsize.y; ++y){
+		for(int x = 0; x < bsize.x; ++x){
+			elevs[x + (bsize.x * y)] =
+				board_elevation_at(board, point2i(x, y)) + '0';
+			reprs[x + (bsize.x * y)] =
+				tile_repr(board_terrain_at(board, point2i(x, y)));
+		}
 	}
-	printf("\n");
 
-	free(str);
-	free(rot);
+	draw_borders();
+
+	// 'game' loop, only stays open for 2 seconds
+	while(ctime < itime + 2000){
+		ctime = SDL_GetTicks();
+		cclock = SDL_GetTicks();
+		
+		// Switching the selection if needed
+		if(cclock > pclock + 500 || pclock == 0){
+			sel = (sel == reprs) ? elevs : reprs;
+			pclock = cclock;
+		}
+	}
+
+
 	SDL_Quit();
+	endwin();
 
 	return 0;
 }
