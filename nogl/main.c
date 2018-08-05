@@ -4,6 +4,7 @@
 #include "board.h"
 #include "point.h"
 #include "board_renderer.h"
+#include "err.h"
 #include <ncurses.h>
 
 static Board* board = NULL;
@@ -51,6 +52,12 @@ int main()
 		return -1;
 	}
 
+	boardRenderer_render();
+	getchar();
+	err_enable_logging("test");
+	//refresh();
+	getchar();
+	err_clear();
 	boardRenderer_render();
 	getchar();
 

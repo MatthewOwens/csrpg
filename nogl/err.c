@@ -3,20 +3,24 @@
 #include <ncurses.h>
 #include "point.h"
 
-char* lpath = NULL;
-static const char lendchar = '+';
-static const char lchar = '-';
+static WINDOW *win = NULL;
+static char* lpath = NULL;
+
+#define ERR_X 0
+#define ERR_Y 0
+#define ERR_W 80
+#define ERR_H 3
 
 void err_output(const char *message)
 {
-	Point2i scrsize = point2i(0,0);
-
 	if(stdscr == NULL){	// ncurses not initilised
 		fprintf(stderr, message);
 	} else {
 		err_clear();
-		getmaxyx(stdscr, scrsize.y, scrsize.x);
-		mvprintw(5, 5, message);
+		win = newwin(ERR_H, ERR_W, ERR_Y, ERR_X);
+		wborder(win, '|', '|', '-', '-', '+', '+', '+', '+');
+		mvwprintw(win, 1, 2, message);
+		wrefresh(win);
 	}
 }
 
@@ -27,13 +31,8 @@ void err_enable_logging(const char* logpath)
 
 void err_clear()
 {
-	Point2i msgpos;
-	getmaxyx(stdscr, msgpos.y, msgpos.x);
-
-	mvaddch(msgpos.y, 0, lendchar);
-	mvaddch(msgpos.y, msgpos.x, lendchar);
-
-	for(int i = 1; i < msgpos.y; ++i){
-		mvaddch(msgpos.y, i, lchar);
-	}
+	wborder(win, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
+	wrefresh(win);
+	delwin(win);
+	win = NULL;
 }
