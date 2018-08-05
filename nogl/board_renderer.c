@@ -6,6 +6,15 @@ static WINDOW *win = NULL;
 static Point2i winPos;
 static Point2i winSize;
 
+void clear_internal()
+{
+	for(int y = 1; y < winSize.y - 1; ++y){
+		for(int x = 1; x < winSize.x - 1; ++x){
+			mvaddch(y, x , ' ');
+		}
+	}
+}
+
 void boardRenderer_init()
 {
 	Point2i termsize;
