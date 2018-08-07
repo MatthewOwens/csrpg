@@ -27,7 +27,7 @@ void draw_board()
 	}
 }
 
-void boardRenderer_init()
+void brndr_init()
 {
 	Point2i termsize;
 
@@ -39,19 +39,19 @@ void boardRenderer_init()
 	win = newwin(winSize.y, winSize.x, winPos.y, winPos.x);
 }
 
-void boardRenderer_render()
+void brndr_render()
 {
 	wborder(win, '|', '|', '-', '-', '+', '+', '+', '+');
 	draw_board();
 	wrefresh(win);
 }
 
-void boardRenderer_set_board(Board *board)
+void brndr_set_board(Board *board)
 {
 	b = board;
 }
 
-void boardRenderer_cleanup()
+void brndr_cleanup()
 {
 	// clearing the border
 	wborder(win, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
