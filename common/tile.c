@@ -52,12 +52,3 @@ enum Terrain tile_terrain(Tile *t)
 	Tile_t *tt = (Tile_t *) t;
 	return tt->terrain;
 }
-
-char tile_repr(enum Terrain t)
-{
-	if(t < 0 || t > LAST){
-		return '?';
-	} else {
-		return repr[t];
-	}
-}

@@ -1,4 +1,5 @@
 #include "board_renderer.h"
+#include "tile_renderer.h"
 #include "point.h"
 #include "err.h"
 
@@ -6,6 +7,7 @@ static Board *b = NULL;
 static WINDOW *win = NULL;
 static Point2i winPos;
 static Point2i winSize;
+static int layer = 0;
 
 void draw_board()
 {
@@ -22,7 +24,8 @@ void draw_board()
 	Point2i bsize = board_get_size(b);
 	for(int y = 0; y < bsize.y; ++y){
 		for(int x = 0; x < bsize.x; ++x){
-			mvwaddch(win, 1+y, 1+x, '#');
+			Tile *t = board_tile_at(b, point2i(x,y));
+			mvwaddch(win, 1+y, 1+x, trndr_repr(t, layer));
 		}
 	}
 }
@@ -49,6 +52,7 @@ void brndr_render()
 void brndr_set_board(Board *board)
 {
 	b = board;
+	trndr_set_board(board);
 }
 
 void brndr_cleanup()
@@ -57,4 +61,9 @@ void brndr_cleanup()
 	wborder(win, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
 	b = NULL;
 	delwin(win);
+}
+
+void brndr_set_rendered_layer(int l)
+{
+	layer = l;
 }

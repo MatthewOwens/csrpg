@@ -52,10 +52,9 @@ int main()
 		return -1;
 	}
 	brndr_set_board(board);
+	brndr_set_rendered_layer(5);	//TODO: implement way to change layer
 
 	brndr_render();
-	getchar();
-	err_enable_logging("test");
 	getchar();
 	err_clear();
 	brndr_render();
