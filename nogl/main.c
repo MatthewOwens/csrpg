@@ -66,9 +66,9 @@ int main()
 				quit = true;
 				break;
 			case LAYER_UP:
-				//if(layer < 9){
-				//	layer++;
-				//}
+				if(layer < 9){
+					layer++;
+				}
 				layer++;
 				brndr_set_rendered_layer(layer);
 				brndr_render();
