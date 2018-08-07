@@ -69,7 +69,6 @@ int main()
 				if(layer < 9){
 					layer++;
 				}
-				layer++;
 				brndr_set_rendered_layer(layer);
 				brndr_render();
 				break;
