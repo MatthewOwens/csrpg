@@ -56,7 +56,6 @@ int main()
 	brndr_render();
 	getchar();
 	err_enable_logging("test");
-	//refresh();
 	getchar();
 	err_clear();
 	brndr_render();
