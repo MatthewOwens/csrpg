@@ -51,6 +51,7 @@ int main()
 		fprintf(stderr, "board null after init!\n");
 		return -1;
 	}
+	boardRenderer_set_board(board);
 
 	boardRenderer_render();
 	getchar();
