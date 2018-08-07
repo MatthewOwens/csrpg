@@ -3,9 +3,9 @@
 #include <ncurses.h>
 #include "board.h"
 
-void boardRenderer_init();
-void boardRenderer_render();
-void boardRenderer_cleanup();
-void boardRenderer_set_board(Board *board);
+void brndr_init();
+void brndr_render();
+void brndr_cleanup();
+void brndr_set_board(Board *board);
 
 #endif//BOARD_RENDERER_H

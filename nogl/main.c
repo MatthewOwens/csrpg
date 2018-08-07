@@ -17,7 +17,7 @@ bool init()
 	}
 
 	initscr();
-	boardRenderer_init();
+	brndr_init();
 	curs_set(false);
 	return true;
 }
@@ -51,19 +51,19 @@ int main()
 		fprintf(stderr, "board null after init!\n");
 		return -1;
 	}
-	boardRenderer_set_board(board);
+	brndr_set_board(board);
 
-	boardRenderer_render();
+	brndr_render();
 	getchar();
 	err_enable_logging("test");
 	//refresh();
 	getchar();
 	err_clear();
-	boardRenderer_render();
+	brndr_render();
 	getchar();
 
 	SDL_Quit();
-	boardRenderer_cleanup();
+	brndr_cleanup();
 	endwin();
 
 	return 0;
