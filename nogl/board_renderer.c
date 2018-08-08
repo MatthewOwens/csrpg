@@ -51,8 +51,8 @@ void brndr_init()
 
 void brndr_render()
 {
-	wborder(win, '|', '|', '-', '-', '+', '+', '+', '+');
 	draw_board();
+	wborder(win, '|', '|', '-', '-', '+', '+', '+', '+');
 	wrefresh(win);
 }
 
