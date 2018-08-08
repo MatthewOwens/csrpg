@@ -5,7 +5,7 @@
 static Board *b = NULL;
 static const char repr[] = {'X', '.', '^', '\'', '~', '*', '|', '0'};
 const static char col_repr = '#';
-const static char air_repr = 'A';
+const static char air_repr = ' ';
 const static char unk_repr = '?';
 
 char trndr_repr(Tile *t, int dlayer)

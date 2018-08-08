@@ -5,6 +5,10 @@ enum Action{
 	LAYER_UP,
 	LAYER_DOWN,
 	ERR_CLEAR,
+	MAP_LEFT,
+	MAP_DOWN,
+	MAP_UP,
+	MAP_RIGHT,
 	ACTION_LAST
 };
 

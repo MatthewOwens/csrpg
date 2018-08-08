@@ -82,6 +82,22 @@ int main()
 			case ERR_CLEAR:
 				err_clear();
 				break;
+			case MAP_LEFT:
+				brndr_move_draw_pos(point2i(-1,0));
+				brndr_render();
+				break;
+			case MAP_RIGHT:
+				brndr_move_draw_pos(point2i(1,0));
+				brndr_render();
+				break;
+			case MAP_UP:
+				brndr_move_draw_pos(point2i(0,-1));
+				brndr_render();
+				break;
+			case MAP_DOWN:
+				brndr_move_draw_pos(point2i(0,1));
+				brndr_render();
+				break;
 		}
 	}
 

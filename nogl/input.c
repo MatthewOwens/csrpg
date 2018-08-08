@@ -2,7 +2,7 @@
 #include "stdio.h"
 #include "err.h"
 
-static char keys[] = {'q', 'K', 'J', 'c'};
+static char keys[] = {'q','K','J','c','h','j','k','l'};
 
 enum Action input_update()
 {
