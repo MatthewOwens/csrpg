@@ -25,6 +25,12 @@ bool init()
 	return true;
 }
 
+void render()
+{
+	brndr_render();
+	irndr_render();
+}
+
 int main()
 {
 	int layer = 0;
@@ -41,8 +47,7 @@ int main()
 	brndr_set_board(board);
 	brndr_set_rendered_layer(layer);
 
-	brndr_render();
-	irndr_render();
+	render();
 
 	while(!quit){
 		switch(input_update()){
@@ -54,33 +59,35 @@ int main()
 					layer++;
 				}
 				brndr_set_rendered_layer(layer);
-				brndr_render();
+				irndr_set_layer(layer);
+				render();
 				break;
 			case LAYER_DOWN:
 				if(layer > 0){
 					layer--;
 				}
 				brndr_set_rendered_layer(layer);
-				brndr_render();
+				irndr_set_layer(layer);
+				render();
 				break;
 			case ERR_CLEAR:
 				err_clear();
 				break;
 			case MAP_LEFT:
 				brndr_move_draw_pos(point2i(-1,0));
-				brndr_render();
+				render();
 				break;
 			case MAP_RIGHT:
 				brndr_move_draw_pos(point2i(1,0));
-				brndr_render();
+				render();
 				break;
 			case MAP_UP:
 				brndr_move_draw_pos(point2i(0,-1));
-				brndr_render();
+				render();
 				break;
 			case MAP_DOWN:
 				brndr_move_draw_pos(point2i(0,1));
-				brndr_render();
+				render();
 				break;
 		}
 	}
