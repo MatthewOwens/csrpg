@@ -23,25 +23,6 @@ bool init()
 	return true;
 }
 
-void draw_borders()
-{
-	char c = 'X';
-
-	for(int i = 0; i < 80; ++i){
-		mvaddch(0, i, c);
-		mvaddch(22, i, c);
-		mvaddch(24, i, c);
-	}
-
-	for(int i = 0; i < 25; ++i){
-		mvaddch(i, 0, c);
-		mvaddch(i, 79, c);
-	}
-
-	// updating the screen
-	refresh();
-}
-
 int main()
 {
 	int layer = 0;
