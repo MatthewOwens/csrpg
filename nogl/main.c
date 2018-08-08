@@ -5,6 +5,7 @@
 #include "board.h"
 #include "point.h"
 #include "board_renderer.h"
+#include "info_renderer.h"
 #include "err.h"
 #include "input.h"
 
@@ -19,6 +20,7 @@ bool init()
 
 	initscr();
 	brndr_init();
+	irndr_init();
 	curs_set(false);
 	return true;
 }
@@ -40,6 +42,7 @@ int main()
 	brndr_set_rendered_layer(layer);
 
 	brndr_render();
+	irndr_render();
 
 	while(!quit){
 		switch(input_update()){
@@ -84,6 +87,7 @@ int main()
 
 	SDL_Quit();
 	brndr_cleanup();
+	irndr_cleanup();
 	endwin();
 
 	return 0;

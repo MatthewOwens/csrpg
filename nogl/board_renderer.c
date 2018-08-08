@@ -44,7 +44,8 @@ void brndr_init()
 	drawPos = point2i(1,1);
 	getmaxyx(stdscr, termsize.y, termsize.x);
 	winSize = termsize;
-	winSize.y -= 2;
+	winSize.y -= 4;
+	//winSize.y -= 2;
 
 	win = newwin(winSize.y, winSize.x, winPos.y, winPos.x);
 }
@@ -79,4 +80,9 @@ void brndr_move_draw_pos(Point2i p)
 {
 	drawPos.x += p.x;
 	drawPos.y += p.y;
+}
+
+int brndr_get_rendered_layer()
+{
+	return layer;
 }
