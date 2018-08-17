@@ -1,4 +1,5 @@
 #include "tile.h"
+#include "err.h"
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdbool.h>
@@ -11,12 +12,12 @@ typedef struct
 	enum Terrain terrain;
 } Tile_t;
 
-static const char repr[] = {'X', '.', '^', '\'', '~', '#', '*', '|', '0'};
 
 Tile *tile_init(Point3i pos, enum Terrain ter)
 {
 	Tile_t *t = malloc(sizeof(Tile_t));
 	bool clamped = false;
+	char msg[80];
 
 	t->position = pos;
 	t->terrain = ter;
@@ -28,8 +29,8 @@ Tile *tile_init(Point3i pos, enum Terrain ter)
 		t->position.z = 9;
 	}
 	if(clamped == true){
-		//TODO: err output
-		//fprintf(stderr, CLAMPERR, t->position.z);
+		sprintf(msg, CLAMPERR, t->position.z);
+		err_output(msg);
 	}
 
 	return (Tile *) t;
@@ -50,13 +51,4 @@ enum Terrain tile_terrain(Tile *t)
 {
 	Tile_t *tt = (Tile_t *) t;
 	return tt->terrain;
-}
-
-char tile_repr(enum Terrain t)
-{
-	if(t < 0 || t > LAST){
-		return '?';
-	} else {
-		return repr[t];
-	}
 }
