@@ -135,15 +135,15 @@ void crpgShaderUse(Shader *s)
 void crpgShaderSetBool(Shader *s, const char *name, bool val)
 {
 	Shader_t *st = (Shader_t *)s;
-	glUniform1i(glGetUniformLocation(st->id, name, (int)val));
+	glUniform1i(glGetUniformLocation(st->id, name), (int)val);
 }
 void crpgShaderSetInt(Shader *s, const char *name, int val)
 {
 	Shader_t *st = (Shader_t *)s;
-	glUniform1i(glGetUniformLocation(st->id, name, val);
+	glUniform1i(glGetUniformLocation(st->id, name), val);
 }
 void crpgShaderSetFloat(Shader *s, const char *name, float val)
 {
 	Shader_t *st = (Shader_t *)s;
-	glUniform1f(glGetUniformLocation(st->id, name, val);
+	glUniform1f(glGetUniformLocation(st->id, name), val);
 }
