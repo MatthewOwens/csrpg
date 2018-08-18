@@ -11,58 +11,79 @@ static int screen_width = 1280;
 static int screen_height = 720;
 
 static float vertices[] = {
-	-0.5f, -0.5f, 0.0f,
-	0.5f, -0.5f, 0.0f,
-	0.0f, 0.5f, 0.0f
+	0.0f, 0.5f, 0.0f,		// top right
+	0.0f, -0.5f, 0.0f,		// bottom right
+	-1.0f, -0.5f, 0.0f,		// bottom left
+	-1.0f, 0.5f, 0.0f		// top left
 };
 
-static unsigned int vbo, vao;
-static unsigned int vertShader, fragShader, shaderProgram;
-static GLchar *vertSrc = NULL;
-static GLchar *fragSrc = NULL;
+static float vertices2[] = {
+	1.0f, 0.5f, 0.0f,		// top right
+	1.0f, -0.5f, 0.0f,		// bottom right
+	0.0f, -0.5f, 0.0f,		// bottom left
+	0.0f, 0.5f, 0.0f		// top left
+};
 
-static void initTri()
+static unsigned int indices[] = {
+	0, 1, 3,
+	1, 2, 3
+};
+
+static unsigned int ebo;
+static unsigned int vbos[2], vaos[2];
+static unsigned int vertShader[2], fragShader[2], shaderProgram[2];
+static GLchar *vertSrc[2];
+static GLchar *fragSrc[2];
+
+static void initShapes()
 {
-	glGenBuffers(1, &vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glGenBuffers(2, vbos);
+	glGenVertexArrays(2, vaos);
+	glGenBuffers(1, &ebo);
+
+	// first shape
+	glBindVertexArray(vaos[0]);
+	glBindBuffer(GL_ARRAY_BUFFER, vbos[0]);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-
-	vertShader = glCreateShader(GL_VERTEX_SHADER);
-	vertSrc = shader_load_src("tri", VERTEX);
-	shader_compile(vertShader, vertSrc, "triangle vertex");
-
-	fragShader = glCreateShader(GL_FRAGMENT_SHADER);
-	fragSrc = shader_load_src("tri", FRAGMENT);
-	shader_compile(fragShader, fragSrc, "triangle fragment");
-
-	shaderProgram = glCreateProgram();
-	glAttachShader(shaderProgram, vertShader);
-	glAttachShader(shaderProgram, fragShader);
-	glLinkProgram(shaderProgram);
-
-	/*
-	 * The glVertexAttribPointer call is rather complex, so I will document it
-	 * here.
-	 * The 1st paramater specifies the vertex attrib to configure. We want to
-	 * configure the position attribute, as specified with:
-	 * layout (location = 0) in tri.vert.
-	 * The 2nd paramater specifies the size of the attribute to configure.
-	 * We are using a vec3 value in the shader which is composed of 3 values.
-	 * The 3rd specifies the data type of the paramater.
-	 * The 4th specifies if the value should be normalised.
-	 * The 5th specifies the size of the stride and the 6th is the offset.
-	 */
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0); // param is the location of the attrib to enable.
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-	// cleaning up
-	glDeleteShader(vertShader);
-	glDeleteShader(fragShader);
-	shader_free_src(vertSrc);
-	shader_free_src(fragSrc);
+
+	// second shape
+	glBindVertexArray(vaos[1]);
+	glBindBuffer(GL_ARRAY_BUFFER, vbos[1]);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices2), vertices2, GL_STATIC_DRAW);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3*sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	glBindVertexArray(0);	// unbinding vao, since we're done
+
+	vertSrc[0] = shader_load_src("tri", VERTEX);
+	vertSrc[1] = shader_load_src("tri2", VERTEX);
+	fragSrc[0] = shader_load_src("tri", FRAGMENT);
+	fragSrc[1] = shader_load_src("tri2", FRAGMENT);
+
+	for(int i = 0; i < 2; ++i){
+		vertShader[i] = glCreateShader(GL_VERTEX_SHADER);
+		shader_compile(vertShader[i], vertSrc[i], "vertex");
+		fragShader[i] = glCreateShader(GL_FRAGMENT_SHADER);
+		shader_compile(fragShader[i], fragSrc[i], "Fragment");
+
+		shaderProgram[i] = glCreateProgram();
+		glAttachShader(shaderProgram[i], vertShader[i]);
+		glAttachShader(shaderProgram[i], fragShader[i]);
+		glLinkProgram(shaderProgram[i]);
+
+		// cleaning up
+		glDeleteShader(vertShader[i]);
+		glDeleteShader(fragShader[i]);
+		shader_free_src(vertSrc[i]);
+		shader_free_src(fragSrc[i]);
+	}
 }
 
 static bool init()
@@ -108,10 +129,15 @@ static void render()
 {
 	glClearColor(0.2, 0.3, 0.3, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-	glUseProgram(shaderProgram);
-	glBindVertexArray(vao);
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glUseProgram(shaderProgram[0]);
+	glBindVertexArray(vaos[0]);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+	glUseProgram(shaderProgram[1]);
+	glBindVertexArray(vaos[1]);
+	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	SDL_GL_SwapWindow(window);
 }
 
@@ -124,7 +150,7 @@ int main()
 	if(!init())
 		return -1;
 
-	initTri();
+	initShapes();
 	itime = SDL_GetTicks();
 
 
