@@ -21,7 +21,7 @@ crpgTexture *crpgTextureNew(const char *filename){
 		if(chan == 3){
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
 		} else if (chan == 4) {
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 		} else {
 			err_output("Error loading texture, images that are not formatted as\
 					RGB or RGBA are unsupported!");

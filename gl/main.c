@@ -62,7 +62,7 @@ static void initShapes()
 	// loading our textures
 	stbi_set_flip_vertically_on_load(true);
 	tex[0] = crpgTextureNew("textures/wall.jpg");
-	tex[1] = crpgTextureNew("textures/awesomeface.png");
+	tex[1] = crpgTextureNew("textures/target.png");
 
 	shader = crpgShaderNew("tri");
 	crpgShaderUse(shader);
@@ -142,6 +142,8 @@ static void render()
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, crpgTextureGetID(tex[1]));
 
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
