@@ -12,12 +12,12 @@ enum ShaderType
 	CRPG_SHADER_LAST
 };
 
-typedef struct {} Shader;
+typedef struct {} crpgShader;
 
-Shader *crpgShaderNew(const char *shaderName);
-void crpgShaderUse(Shader *s);
-void crpgShaderSetBool(Shader *s, const char *name, bool val);
-void crpgShaderSetInt(Shader *s, const char *name, int val);
-void crpgShaderSetFloat(Shader *s, const char *name, float val);
-void crpgShaderFree(Shader *s);
+crpgShader *crpgShaderNew(const char *shaderName);
+void crpgShaderUse(crpgShader *s);
+void crpgShaderSetBool(crpgShader *s, const char *name, bool val);
+void crpgShaderSetInt(crpgShader *s, const char *name, int val);
+void crpgShaderSetFloat(crpgShader *s, const char *name, float val);
+void crpgShaderFree(crpgShader *s);
 #endif//SHADER_H

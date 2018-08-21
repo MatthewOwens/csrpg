@@ -4,7 +4,9 @@
 #include <GL/glew.h>
 #include <math.h>
 #include "shader.h"
+#include "texture.h"
 #include "err.h"
+#include <stb/stb_image.h>
 
 static SDL_Window *window = NULL;
 static SDL_GLContext *context = NULL;
@@ -14,11 +16,11 @@ static bool quit = false;
 static Uint32 itime;
 
 static float vertices[] = {
-	// positions		// colors
-	0.5f, 0.5f, 0.0f,	1.0f, 0.0f, 0.0f,	// top right
-	0.5f, -0.5f, 0.0f,	0.0f, 0.0f, 1.0f,	// bottom right
-	-0.5f, -0.5f, 0.0f,	0.0f, 0.0f, 1.0f,	// bottom left
-	-0.5f, 0.5f, 0.0f,	1.0f, 0.0f, 0.0f	// top left
+	// positions		// colours		 	// texture coords
+	0.5f, 0.5f, 0.0f,	1.0f, 0.0f, 0.0f,	1.0f, 1.0f, // top right
+	0.5f, -0.5f, 0.0f,	0.0f, 1.0f, 0.0f,	1.0f, 0.0f, // bottom right
+	-0.5f, -0.5f, 0.0f,	0.0f, 1.0f, 0.0f,	0.0f, 0.0f, // bottom left
+	-0.5f, 0.5f, 0.0f,	1.0f, 0.0f, 0.0f,	0.0f, 1.0f  // top left
 };
 
 static unsigned int indices[] = {
@@ -28,7 +30,9 @@ static unsigned int indices[] = {
 
 static unsigned int ebo;
 static unsigned int vbo, vao;
-Shader *shader = NULL;
+static float blendVal = 0.2f;
+static crpgShader *shader = NULL;
+crpgTexture *tex[2];
 
 static void initShapes()
 {
@@ -40,15 +44,31 @@ static void initShapes()
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)0);
+	// position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0); // param is the location of the attrib to enable.
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6*sizeof(float), (void*)(3*sizeof(float)));
+	// colour attribute
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(3*sizeof(float)));
 	glEnableVertexAttribArray(1);
+	// texture attribute
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8*sizeof(float), (void*)(6*sizeof(float)));
+	glEnableVertexAttribArray(2);
+
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	glBindVertexArray(0);	// unbinding vao, since we're done
+
+	// loading our textures
+	stbi_set_flip_vertically_on_load(true);
+	tex[0] = crpgTextureNew("textures/wall.jpg");
+	tex[1] = crpgTextureNew("textures/awesomeface.png");
+
 	shader = crpgShaderNew("tri");
+	crpgShaderUse(shader);
+	crpgShaderSetInt(shader, "texture1", 0);
+	crpgShaderSetInt(shader, "texture2", 1);
+	crpgShaderSetFloat(shader, "blendVal", blendVal);
 }
 
 static bool init()
@@ -97,6 +117,16 @@ static void update()
 		if(e.type == SDL_QUIT){
 			quit = true;
 		}
+		if(e.type == SDL_KEYDOWN){
+			if(e.key.keysym.sym == SDLK_k){
+				blendVal += .2f;
+				crpgShaderSetFloat(shader, "blendVal", blendVal);
+			}
+			if(e.key.keysym.sym == SDLK_j){
+				blendVal -= .2f;
+				crpgShaderSetFloat(shader, "blendVal", blendVal);
+			}
+		}
 	}
 }
 
@@ -106,8 +136,15 @@ static void render()
 	glClear(GL_COLOR_BUFFER_BIT);
 
 	crpgShaderUse(shader);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, crpgTextureGetID(tex[0]));
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, crpgTextureGetID(tex[1]));
+
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
 	SDL_GL_SwapWindow(window);
 }
 

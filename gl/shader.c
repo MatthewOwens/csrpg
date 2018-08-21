@@ -17,7 +17,7 @@ static char *fileEnds[] = {
 	".tese"
 };
 
-static char *dirPath = "gl/shaders/";
+static char *dirPath = "shaders/";
 
 char *shaderLoadSrc(const char *name, enum ShaderType type)
 {
@@ -90,7 +90,7 @@ int getGlMacro(enum ShaderType st){
 	return 0;
 }
 
-Shader *crpgShaderNew(const char *shaderName){
+crpgShader *crpgShaderNew(const char *shaderName){
 	Shader_t *s = malloc(sizeof(Shader_t));
 	GLchar *src;
 	unsigned int shader;
@@ -117,32 +117,32 @@ Shader *crpgShaderNew(const char *shaderName){
 	}
 
 	glLinkProgram(s->id);
-	return (Shader *)s;
+	return (crpgShader *)s;
 }
 
-void crpgShaderFree(Shader *s)
+void crpgShaderFree(crpgShader *s)
 {
 	Shader_t *st = (Shader_t *)s;
 	glDeleteProgram(st->id);
 }
 
-void crpgShaderUse(Shader *s)
+void crpgShaderUse(crpgShader *s)
 {
 	Shader_t *st = (Shader_t *)s;
 	glUseProgram(st->id);
 }
 
-void crpgShaderSetBool(Shader *s, const char *name, bool val)
+void crpgShaderSetBool(crpgShader *s, const char *name, bool val)
 {
 	Shader_t *st = (Shader_t *)s;
 	glUniform1i(glGetUniformLocation(st->id, name), (int)val);
 }
-void crpgShaderSetInt(Shader *s, const char *name, int val)
+void crpgShaderSetInt(crpgShader *s, const char *name, int val)
 {
 	Shader_t *st = (Shader_t *)s;
 	glUniform1i(glGetUniformLocation(st->id, name), val);
 }
-void crpgShaderSetFloat(Shader *s, const char *name, float val)
+void crpgShaderSetFloat(crpgShader *s, const char *name, float val)
 {
 	Shader_t *st = (Shader_t *)s;
 	glUniform1f(glGetUniformLocation(st->id, name), val);
