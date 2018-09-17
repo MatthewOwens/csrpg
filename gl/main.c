@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
@@ -6,7 +7,10 @@
 #include "shader.h"
 #include "texture.h"
 #include "err.h"
-#include <stb/stb_image.h>
+#include "stb/stb_image.h"
+#include "math_3d.h"
+#include "point.h"
+#include "cube.h"
 
 static SDL_Window *window = NULL;
 static SDL_GLContext *context = NULL;
@@ -32,7 +36,10 @@ static unsigned int ebo;
 static unsigned int vbo, vao;
 static float blendVal = 0.2f;
 static crpgShader *shader = NULL;
-crpgTexture *tex[2];
+static crpgTexture *tex[2];
+static crpgCube *cube = NULL;
+static mat4_t projection, transform, world_to_screen;
+static vec3_t from, to, up, screenSpace, worldSpace;
 
 static void initShapes()
 {
@@ -69,6 +76,30 @@ static void initShapes()
 	crpgShaderSetInt(shader, "texture1", 0);
 	crpgShaderSetInt(shader, "texture2", 1);
 	crpgShaderSetFloat(shader, "blendVal", blendVal);
+
+	transform = m4_translation(vec3(0.5, 0.5, 0.f));
+	transform = m4_mul(transform, m4_scaling(vec3(.5f, .5f, 1.f)));
+	transform = m4_mul(transform, m4_rotation(m_deg_to_rad(45.f), vec3(0.f, 0.f, 1.f)));
+
+	printf("wall transform\n");
+	m4_print(transform);
+	unsigned int transformLoc = glGetUniformLocation(crpgShaderID(shader), "transform");
+	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, &transform);
+
+	cube = crpgCubeNew();
+	//crpgCubePosition(cube, vec3(0.5, 0.5, 0.f));
+}
+
+static void initView()
+{
+	projection = m4_perspective(60, (float)screen_width/(float)screen_height, 1, 10);
+	from = vec3(0, 0.5, 2);
+	to = vec3(0,0,0);
+	up = vec3(0,1,0);
+	transform = m4_look_at(from, to, up);
+	worldSpace = vec3(1, 1, -1);
+	world_to_screen = m4_mul(projection, transform);
+	screenSpace = m4_mul_pos(world_to_screen, worldSpace);
 }
 
 static bool init()
@@ -146,6 +177,9 @@ static void render()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+
+	crpgCubeRender(cube);	// Not rendering??
 
 	SDL_GL_SwapWindow(window);
 }
@@ -156,6 +190,7 @@ int main()
 		return -1;
 
 	initShapes();
+	initView();
 	itime = SDL_GetTicks();
 
 	while(!quit){
@@ -164,5 +199,6 @@ int main()
 	}
 
 	SDL_Quit();
+	crpgCubeFree(cube);
 	return 0;
 }

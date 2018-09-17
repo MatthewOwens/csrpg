@@ -20,4 +20,5 @@ void crpgShaderSetBool(crpgShader *s, const char *name, bool val);
 void crpgShaderSetInt(crpgShader *s, const char *name, int val);
 void crpgShaderSetFloat(crpgShader *s, const char *name, float val);
 void crpgShaderFree(crpgShader *s);
+unsigned int crpgShaderID(crpgShader *s);
 #endif//SHADER_H

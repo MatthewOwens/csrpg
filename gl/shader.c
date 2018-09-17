@@ -6,7 +6,7 @@
 #include "fileRead.h"
 #include "err.h"
 typedef struct {
-	int id;
+	unsigned int id;
 } Shader_t;
 
 static char *fileEnds[] = {
@@ -146,4 +146,10 @@ void crpgShaderSetFloat(crpgShader *s, const char *name, float val)
 {
 	Shader_t *st = (Shader_t *)s;
 	glUniform1f(glGetUniformLocation(st->id, name), val);
+}
+
+unsigned int crpgShaderID(crpgShader *s)
+{
+	Shader_t *st = (Shader_t *)s;
+	return st->id;
 }
