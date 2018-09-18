@@ -38,7 +38,7 @@ static float blendVal = 0.2f;
 static crpgShader *shader = NULL;
 static crpgTexture *tex[2];
 static crpgCube *cube = NULL;
-static mat4_t projection, transform, world_to_screen;
+static mat4_t projection, transform, camera, world_to_screen;
 static vec3_t from, to, up, screenSpace, worldSpace;
 
 static void initShapes()
@@ -87,19 +87,25 @@ static void initShapes()
 	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, &transform);
 
 	cube = crpgCubeNew();
-	//crpgCubePosition(cube, vec3(0.5, 0.5, 0.f));
+	//crpgCubePosition(cube, vec3(1.5, 0.5, 0.f));
 }
 
 static void initView()
 {
 	projection = m4_perspective(60, (float)screen_width/(float)screen_height, 1, 10);
-	from = vec3(0, 0.5, 2);
+	//from = vec3(0, 0.5, 2);
+	from = vec3(3,3,3);
 	to = vec3(0,0,0);
 	up = vec3(0,1,0);
-	transform = m4_look_at(from, to, up);
+	camera = m4_look_at(from, to, up);
 	worldSpace = vec3(1, 1, -1);
-	world_to_screen = m4_mul(projection, transform);
+	world_to_screen = m4_mul(projection, camera);
 	screenSpace = m4_mul_pos(world_to_screen, worldSpace);
+
+	crpgCubeSetCamera(cube, &world_to_screen);
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 }
 
 static bool init()
@@ -164,7 +170,7 @@ static void update()
 static void render()
 {
 	glClearColor(0.2, 0.3, 0.3, 1.0);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	crpgShaderUse(shader);
 

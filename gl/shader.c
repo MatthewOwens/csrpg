@@ -128,8 +128,12 @@ void crpgShaderFree(crpgShader *s)
 
 void crpgShaderUse(crpgShader *s)
 {
-	Shader_t *st = (Shader_t *)s;
-	glUseProgram(st->id);
+	if(s == NULL){
+		glUseProgram(0);
+	} else {
+		Shader_t *st = (Shader_t *)s;
+		glUseProgram(st->id);
+	}
 }
 
 void crpgShaderSetBool(crpgShader *s, const char *name, bool val)

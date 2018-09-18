@@ -6,84 +6,39 @@
 #include <stb/stb_image.h>
 #include "err.h"
 
-/*
-static float vertices[] = {
-	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-
-	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-	-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-	-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-	 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	 0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-	-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-	-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-};*/
-
 static GLfloat vertices[] = {
-	//  X     Y     Z       U     V
+	//X     Y     Z      U     V
 	// bottom
-	-1.0f,-1.0f,-1.0f,   0.0f, 0.0f,
-	1.0f,-1.0f,-1.0f,   1.0f, 0.0f,
-	-1.0f,-1.0f, 1.0f,   0.0f, 1.0f,
-	1.0f,-1.0f,-1.0f,   1.0f, 0.0f,
-	1.0f,-1.0f, 1.0f,   1.0f, 1.0f,
-	-1.0f,-1.0f, 1.0f,   0.0f, 1.0f,
+	-1.0f,-1.0f,-1.0f,  0.0f, 0.0f,
+	 1.0f,-1.0f,-1.0f,  1.0f, 0.0f,
+	-1.0f,-1.0f, 1.0f,  0.0f, 1.0f,
+	 1.0f,-1.0f,-1.0f,  1.0f, 0.0f,
+	 1.0f,-1.0f, 1.0f,  1.0f, 1.0f,
+	-1.0f,-1.0f, 1.0f,  0.0f, 1.0f,
 
 	// top
 	-1.0f, 1.0f,-1.0f,   0.0f, 0.0f,
 	-1.0f, 1.0f, 1.0f,   0.0f, 1.0f,
-	1.0f, 1.0f,-1.0f,   1.0f, 0.0f,
-	1.0f, 1.0f,-1.0f,   1.0f, 0.0f,
+	 1.0f, 1.0f,-1.0f,   1.0f, 0.0f,
+	 1.0f, 1.0f,-1.0f,   1.0f, 0.0f,
 	-1.0f, 1.0f, 1.0f,   0.0f, 1.0f,
-	1.0f, 1.0f, 1.0f,   1.0f, 1.0f,
+	 1.0f, 1.0f, 1.0f,   1.0f, 1.0f,
 
 	// front
 	-1.0f,-1.0f, 1.0f,   1.0f, 0.0f,
-	1.0f,-1.0f, 1.0f,   0.0f, 0.0f,
+	 1.0f,-1.0f, 1.0f,   0.0f, 0.0f,
 	-1.0f, 1.0f, 1.0f,   1.0f, 1.0f,
-	1.0f,-1.0f, 1.0f,   0.0f, 0.0f,
-	1.0f, 1.0f, 1.0f,   0.0f, 1.0f,
+	 1.0f,-1.0f, 1.0f,   0.0f, 0.0f,
+	 1.0f, 1.0f, 1.0f,   0.0f, 1.0f,
 	-1.0f, 1.0f, 1.0f,   1.0f, 1.0f,
 
 	// back
 	-1.0f,-1.0f,-1.0f,   0.0f, 0.0f,
 	-1.0f, 1.0f,-1.0f,   0.0f, 1.0f,
-	1.0f,-1.0f,-1.0f,   1.0f, 0.0f,
-	1.0f,-1.0f,-1.0f,   1.0f, 0.0f,
+	 1.0f,-1.0f,-1.0f,   1.0f, 0.0f,
+	 1.0f,-1.0f,-1.0f,   1.0f, 0.0f,
 	-1.0f, 1.0f,-1.0f,   0.0f, 1.0f,
-	1.0f, 1.0f,-1.0f,   1.0f, 1.0f,
+	 1.0f, 1.0f,-1.0f,   1.0f, 1.0f,
 
 	// left
 	-1.0f,-1.0f, 1.0f,   0.0f, 1.0f,
@@ -99,10 +54,11 @@ static GLfloat vertices[] = {
 	1.0f, 1.0f,-1.0f,   0.0f, 0.0f,
 	1.0f,-1.0f, 1.0f,   1.0f, 1.0f,
 	1.0f, 1.0f,-1.0f,   0.0f, 0.0f,
+	1.0f, 1.0f, 1.0f,   0.0f, 1.0f
 };
 
 static bool initilised = false;
-static unsigned int vbo, vao, transformLoc;
+static unsigned int vbo, vao, transformLoc, cameraLoc;
 static crpgShader *shader = NULL;
 static crpgTexture *tex = NULL;
 
@@ -138,6 +94,15 @@ void initShader(Cube_t *ct)
 	crpgShaderSetInt(shader, "texture0", 0);
 	transformLoc = glGetUniformLocation(crpgShaderID(shader), "transform");
 	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, &ct->transform);
+}
+
+void crpgCubeSetCamera(crpgCube *c, mat4_t *cam)
+{
+	Cube_t *ct = (Cube_t *) c;
+	crpgShaderUse(shader);
+	unsigned int loc = glGetUniformLocation(crpgShaderID(shader), "camera");
+	glUniformMatrix4fv(loc, 1, GL_FALSE, cam);
+	crpgShaderUse(0);
 }
 
 static bool printed = false;

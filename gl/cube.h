@@ -10,4 +10,5 @@ void crpgCubeScale(crpgCube *c, vec3_t scale);
 void crpgCubeRotation(crpgCube *c, float rot, vec3_t axis);
 void crpgCubeRender(crpgCube *c);
 void crpgCubeFree(crpgCube *c);
+void crpgCubeSetCamera(crpgCube *c, mat4_t *cam);
 #endif//CRPGCUBE_H
