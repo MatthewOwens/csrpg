@@ -11,6 +11,7 @@
 #include "math_3d.h"
 #include "point.h"
 #include "cube.h"
+#include "camera.h"
 
 static SDL_Window *window = NULL;
 static SDL_GLContext *context = NULL;
@@ -38,8 +39,8 @@ static float blendVal = 0.2f;
 static crpgShader *shader = NULL;
 static crpgTexture *tex[2];
 static crpgCube *cubes[2];
-static mat4_t projection, transform, camera, world_to_screen;
-static vec3_t from, to, up, screenSpace, worldSpace;
+static crpgCamera *camera = NULL;
+static mat4_t transform;
 
 static void initShapes()
 {
@@ -97,18 +98,10 @@ static void initShapes()
 
 static void initView()
 {
-	projection = m4_perspective(60, (float)screen_width/(float)screen_height, 1, 10);
-	//from = vec3(0, 0.5, 2);
-	from = vec3(0,0,4);
-	to = vec3(0,0,0);
-	up = vec3(0,1,0);
-	camera = m4_look_at(from, to, up);
-	worldSpace = vec3(1, 1, -1);
-	world_to_screen = m4_mul(projection, camera);
-	screenSpace = m4_mul_pos(world_to_screen, worldSpace);
-
-	crpgCubeSetCamera(cubes[0], &world_to_screen);
-	crpgCubeSetCamera(cubes[1], &world_to_screen);
+	crpgCameraSetAR((float)screen_width/(float)screen_height);
+	camera = crpgCameraNew(vec3(0,0,4), vec3(0,0,0), vec3(0,1,0));
+	crpgCubeSetCamera(cubes[0], crpgCameraGetMat(camera));
+	crpgCubeSetCamera(cubes[1], crpgCameraGetMat(camera));
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
