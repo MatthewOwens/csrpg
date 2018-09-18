@@ -37,7 +37,7 @@ static unsigned int vbo, vao;
 static float blendVal = 0.2f;
 static crpgShader *shader = NULL;
 static crpgTexture *tex[2];
-static crpgCube *cube = NULL;
+static crpgCube *cubes[2];
 static mat4_t projection, transform, camera, world_to_screen;
 static vec3_t from, to, up, screenSpace, worldSpace;
 
@@ -86,15 +86,20 @@ static void initShapes()
 	unsigned int transformLoc = glGetUniformLocation(crpgShaderID(shader), "transform");
 	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, &transform);
 
-	cube = crpgCubeNew();
-	//crpgCubePosition(cube, vec3(1.5, 0.5, 0.f));
+	cubes[0] = crpgCubeNew();
+	crpgCubeScale(cubes[0], vec3(1.5f, 1.f, 1.f));
+	crpgCubePosition(cubes[0], vec3(1.0, 0.f, 0.f));
+	crpgCubeRotation(cubes[0], 0.785f, vec3(0,1,0));
+
+	cubes[1] = crpgCubeNew();
+	crpgCubePosition(cubes[1], vec3(-3.0, 0.f, -1.f));
 }
 
 static void initView()
 {
 	projection = m4_perspective(60, (float)screen_width/(float)screen_height, 1, 10);
 	//from = vec3(0, 0.5, 2);
-	from = vec3(3,3,3);
+	from = vec3(0,0,4);
 	to = vec3(0,0,0);
 	up = vec3(0,1,0);
 	camera = m4_look_at(from, to, up);
@@ -102,7 +107,8 @@ static void initView()
 	world_to_screen = m4_mul(projection, camera);
 	screenSpace = m4_mul_pos(world_to_screen, worldSpace);
 
-	crpgCubeSetCamera(cube, &world_to_screen);
+	crpgCubeSetCamera(cubes[0], &world_to_screen);
+	crpgCubeSetCamera(cubes[1], &world_to_screen);
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
@@ -185,7 +191,8 @@ static void render()
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 
-	crpgCubeRender(cube);	// Not rendering??
+	crpgCubeRender(cubes[0]);
+	crpgCubeRender(cubes[1]);
 
 	SDL_GL_SwapWindow(window);
 }
@@ -205,6 +212,7 @@ int main()
 	}
 
 	SDL_Quit();
-	crpgCubeFree(cube);
+	crpgCubeFree(cubes[0]);
+	crpgCubeFree(cubes[1]);
 	return 0;
 }
