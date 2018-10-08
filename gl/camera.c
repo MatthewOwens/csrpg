@@ -9,6 +9,10 @@ typedef struct
 {
 	vec3_t from, to, up;
 	mat4_t camera, perspective, worldToScreen;
+	float speed;
+
+	// Axis' to manouver across. If 0, no movement is occuring
+	vec3_t pan, yaw, roll;
 } Camera_t;
 
 ///TODO: figure out why this is failing
@@ -37,6 +41,7 @@ crpgCamera *crpgCameraNew(vec3_t from, vec3_t to, vec3_t up)
 	//ct->perspective = recalcPerspective(90.f, 1, 10);
 	ct->perspective = m4_perspective(60, aspectRatio, 1, 10);
 	ct->worldToScreen = m4_mul(ct->perspective, ct->camera);
+	ct->speed = 1.0f;
 
 	crpgCamera *c = (crpgCamera *) ct;
 	return c;
@@ -51,20 +56,57 @@ void crpgCameraFree(crpgCamera *c)
 	}
 }
 
-void crpgCameraPan(crpgCamera *c, vec3_t pan)
+void crpgCameraSetSpeed(crpgCamera *c, float speedPerSecond)
 {
-	Camera_t *ct = (Camera_t *) c;
-	ct->from.x += pan.x;
-	ct->from.y += pan.y;
-	ct->from.z += pan.z;
+	if(c == NULL) return;
 
-	// recalc camera matrices
-	ct->camera = m4_look_at(ct->from, ct->to, ct->up);
-	ct->worldToScreen = m4_mul(ct->perspective, ct->camera);
+	Camera_t *ct = (Camera_t *) c;
+	ct->speed = speedPerSecond;
+}
+
+// This function expects a vec3_t formatted with values of 1, 0 or -1.
+// to represent if the axis should be panned across and the direction
+void crpgCameraPan(crpgCamera *c, vec3_t panAxis)
+{
+	if(c == NULL)
+		return;
+
+	Camera_t *ct = (Camera_t *) c;
+	ct->pan = panAxis;
+
 }
 
 mat4_t *crpgCameraGetMat(crpgCamera *c)
 {
 	Camera_t *ct = (Camera_t *)c;
 	return &(ct->worldToScreen);
+}
+
+// expecting components as {from, to, up}
+void updatePan(vec3_t panAxis, vec3_t *components[3], float speed, float dtms)
+{
+	int axis[] = { panAxis.x, panAxis.y, panAxis.z };
+	float* fromArr[] = { &components[0]->x, &components[0]->y, &components[0]->z };
+	float* toArr[] = { &components[1]->x, &components[1]->y, &components[1]->z };
+
+	for(int i = 0; i < 3; ++i){
+		if(axis[i] != 0){	// if we should pan on this axis
+			int sign = 0;
+			sign = (axis[i] > 0) ? 1 : -1;
+			*fromArr[i] += sign * (speed/1000.f);
+			*toArr[i] += sign * (speed/1000.f);
+		}
+	}
+}
+
+void crpgCameraUpdate(crpgCamera *c, float dtms)
+{
+	Camera_t *ct = (Camera_t *)c;
+	vec3_t *components[] = { &(ct->from), &(ct->to), &(ct->up) };
+
+	updatePan(ct->pan, components, ct->speed, dtms);
+
+	// recalc camera matrices
+	ct->camera = m4_look_at(ct->from, ct->to, ct->up);
+	ct->worldToScreen = m4_mul(ct->perspective, ct->camera);
 }

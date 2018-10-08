@@ -18,7 +18,7 @@ static SDL_GLContext *context = NULL;
 static int screen_width = 1280;
 static int screen_height = 720;
 static bool quit = false;
-static Uint32 itime;
+static Uint32 ltime, ctime, numframes, cftime, lftime;
 
 static float vertices[] = {
 	// positions		// colours		 	// texture coords
@@ -100,6 +100,7 @@ static void initView()
 {
 	crpgCameraSetAR((float)screen_width/(float)screen_height);
 	camera = crpgCameraNew(vec3(0,0,4), vec3(0,0,0), vec3(0,1,0));
+	crpgCameraSetSpeed(camera, 2);
 	crpgCubeSetCamera(cubes[0], crpgCameraGetMat(camera));
 	crpgCubeSetCamera(cubes[1], crpgCameraGetMat(camera));
 
@@ -148,22 +149,60 @@ static bool init()
 
 static void update()
 {
+	// measuring frame times
+	numframes++;
+	ctime = SDL_GetTicks();
+	if(ctime - ltime > 1000){	// if the last printf was more than a second ago
+		printf("%f ms/frame\n", 1000/(double)(numframes));
+		numframes = 0;
+		ltime = ctime;
+	}
+
+	// calculating delta time
+	cftime = SDL_GetTicks();
+	float dtms = cftime - lftime;
+
 	SDL_Event e;
 	while(SDL_PollEvent(&e) != 0){
 		if(e.type == SDL_QUIT){
 			quit = true;
 		}
 		if(e.type == SDL_KEYDOWN){
-			if(e.key.keysym.sym == SDLK_k){
-				blendVal += .2f;
-				crpgShaderSetFloat(shader, "blendVal", blendVal);
-			}
-			if(e.key.keysym.sym == SDLK_j){
-				blendVal -= .2f;
-				crpgShaderSetFloat(shader, "blendVal", blendVal);
+			switch(e.key.keysym.sym){
+				case SDLK_k:
+					blendVal += .2f;
+					crpgShaderSetFloat(shader, "blendVal", blendVal);
+					break;
+				case SDLK_j:
+					blendVal -= .2f;
+					crpgShaderSetFloat(shader, "blendVal", blendVal);
+					break;
+				case SDLK_w:
+					crpgCameraPan(camera, vec3(0,0,-1));
+					crpgCubeSetCamera(cubes[0], crpgCameraGetMat(camera));
+					crpgCubeSetCamera(cubes[1], crpgCameraGetMat(camera));
+					break;
+				case SDLK_s:
+					crpgCameraPan(camera, vec3(0,0,1));
+					crpgCubeSetCamera(cubes[0], crpgCameraGetMat(camera));
+					crpgCubeSetCamera(cubes[1], crpgCameraGetMat(camera));
+					break;
+				case SDLK_d:
+					crpgCameraPan(camera, vec3(1,0,0));
+					crpgCubeSetCamera(cubes[0], crpgCameraGetMat(camera));
+					crpgCubeSetCamera(cubes[1], crpgCameraGetMat(camera));
+					break;
+				case SDLK_a:
+					crpgCameraPan(camera, vec3(-1,0,0));
+					crpgCubeSetCamera(cubes[0], crpgCameraGetMat(camera));
+					crpgCubeSetCamera(cubes[1], crpgCameraGetMat(camera));
+					break;
 			}
 		}
 	}
+
+	crpgCameraUpdate(camera, dtms);
+	lftime = cftime;
 }
 
 static void render()
@@ -171,6 +210,11 @@ static void render()
 	glClearColor(0.2, 0.3, 0.3, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	glEnable(GL_DEPTH_TEST);
+	crpgCubeRender(cubes[0]);
+	crpgCubeRender(cubes[1]);
+
+	// Rendering our wall
 	crpgShaderUse(shader);
 
 	glActiveTexture(GL_TEXTURE0);
@@ -178,14 +222,13 @@ static void render()
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, crpgTextureGetID(tex[1]));
 
+	// Bypassing depth checks to render 'on the screen'
+	glDisable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBindVertexArray(vao);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
-
-	crpgCubeRender(cubes[0]);
-	crpgCubeRender(cubes[1]);
 
 	SDL_GL_SwapWindow(window);
 }
@@ -197,7 +240,9 @@ int main()
 
 	initShapes();
 	initView();
-	itime = SDL_GetTicks();
+
+	ltime = SDL_GetTicks();
+	lftime = SDL_GetTicks();
 
 	while(!quit){
 		update();
