@@ -12,13 +12,14 @@
 #include "point.h"
 #include "cube.h"
 #include "camera.h"
+#include "timestep.h"
 
 static SDL_Window *window = NULL;
 static SDL_GLContext *context = NULL;
 static int screen_width = 1280;
 static int screen_height = 720;
 static bool quit = false;
-static Uint32 ltime, ctime, numframes, cftime, lftime;
+//static Uint32 ltime, ctime, numframes, cftime, lftime;
 
 static float vertices[] = {
 	// positions		// colours		 	// texture coords
@@ -100,7 +101,7 @@ static void initView()
 {
 	crpgCameraSetAR((float)screen_width/(float)screen_height);
 	camera = crpgCameraNew(vec3(0,0,4), vec3(0,0,0), vec3(0,1,0));
-	crpgCameraSetSpeed(camera, 2);
+	crpgCameraSetSpeed(camera, 20);
 	crpgCubeSetCamera(cubes[0], crpgCameraGetMat(camera));
 	crpgCubeSetCamera(cubes[1], crpgCameraGetMat(camera));
 
@@ -149,18 +150,8 @@ static bool init()
 
 static void update()
 {
-	// measuring frame times
-	numframes++;
-	ctime = SDL_GetTicks();
-	if(ctime - ltime > 1000){	// if the last printf was more than a second ago
-		printf("%f ms/frame\n", 1000/(double)(numframes));
-		numframes = 0;
-		ltime = ctime;
-	}
-
-	// calculating delta time
-	cftime = SDL_GetTicks();
-	float dtms = cftime - lftime;
+	int physUpdates = 0;
+	crpgTimeStepUpdate();
 
 	SDL_Event e;
 	while(SDL_PollEvent(&e) != 0){
@@ -201,8 +192,12 @@ static void update()
 		}
 	}
 
-	crpgCameraUpdate(camera, dtms);
-	lftime = cftime;
+	// Updating physics as many times as we need to consume dt
+	while(crpgTimeStepPhysRequried(physUpdates)){
+		crpgCameraUpdate(camera, crpgTimeStepDelta());
+
+		physUpdates++;
+	}
 }
 
 static void render()
@@ -240,9 +235,7 @@ int main()
 
 	initShapes();
 	initView();
-
-	ltime = SDL_GetTicks();
-	lftime = SDL_GetTicks();
+	crpgTimeStepInit(60.f);
 
 	while(!quit){
 		update();
