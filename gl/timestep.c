@@ -39,12 +39,13 @@ void crpgTimeStepUpdate()
 	totalDeltaTime = frameTime / desiredFrameTime;
 }
 
-bool crpgTimeStepPhysRequried(int updatesThisFrame)
+bool crpgTimeStepPhysRequired(int updatesThisFrame)
 {
 	if(totalDeltaTime <= 0.f || updatesThisFrame >= MAX_PHYSICS_STEPS){
 		return false;
-	} else {
-		deltaTime = fminf(totalDeltaTime, MAX_DELTA_TIME);
-		totalDeltaTime -= deltaTime;
 	}
+
+	deltaTime = fminf(totalDeltaTime, MAX_DELTA_TIME);
+	totalDeltaTime -= deltaTime;
+	return true;
 }

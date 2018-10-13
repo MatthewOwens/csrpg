@@ -1,6 +1,7 @@
 #include "camera.h"
 #include <math.h>
 #include <stdlib.h>
+#include "input.h"
 
 static vec3_t worldSpaceVec;
 static float aspectRatio = 16.f/9.f;	// sane default for the aspect ratio
@@ -99,7 +100,24 @@ void updatePan(vec3_t panAxis, vec3_t *components[3], float speed, float dtms)
 	}
 }
 
-void crpgCameraUpdate(crpgCamera *c, float dtms)
+void crpgCameraUpdate(crpgCamera *c)
+{
+	vec3_t panAxis = (vec3_t){0.f,0.f,0.f};
+
+	panAxis.x = crpgInputHeld(INPUT_CAMERA_PAN_RIGHT) ? 1 : 0;
+	panAxis.x = crpgInputHeld(INPUT_CAMERA_PAN_LEFT) ? -1 : panAxis.x;
+
+	panAxis.y = crpgInputHeld(INPUT_CAMERA_PAN_UP) ? 1 : 0;
+	panAxis.y = crpgInputHeld(INPUT_CAMERA_PAN_DOWN) ? -1 : panAxis.y;
+
+	panAxis.z = crpgInputHeld(INPUT_CAMERA_PAN_IN) ? 1 : 0;
+	panAxis.z = crpgInputHeld(INPUT_CAMERA_PAN_OUT) ? -1 : panAxis.z;
+
+	Camera_t *ct = (Camera_t *)c;
+	ct->pan = panAxis;
+}
+
+void crpgCameraRender(crpgCamera *c, float dtms)
 {
 	Camera_t *ct = (Camera_t *)c;
 	vec3_t *components[] = { &(ct->from), &(ct->to), &(ct->up) };

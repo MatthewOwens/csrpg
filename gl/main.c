@@ -13,6 +13,7 @@
 #include "cube.h"
 #include "camera.h"
 #include "timestep.h"
+#include "input.h"
 
 static SDL_Window *window = NULL;
 static SDL_GLContext *context = NULL;
@@ -141,6 +142,7 @@ static bool init()
 	/* syncing the buffer swap with the monitor's vertical refresh */
 	SDL_GL_SetSwapInterval(1);
 	glViewport(0, 0, screen_width, screen_height);
+	crpgInputInit();
 
 	glewExperimental = GL_TRUE;
 	glewInit();
@@ -158,50 +160,22 @@ static void update()
 		if(e.type == SDL_QUIT){
 			quit = true;
 		}
-		if(e.type == SDL_KEYDOWN){
-			switch(e.key.keysym.sym){
-				case SDLK_k:
-					blendVal += .2f;
-					crpgShaderSetFloat(shader, "blendVal", blendVal);
-					break;
-				case SDLK_j:
-					blendVal -= .2f;
-					crpgShaderSetFloat(shader, "blendVal", blendVal);
-					break;
-				case SDLK_w:
-					crpgCameraPan(camera, vec3(0,0,-1));
-					crpgCubeSetCamera(cubes[0], crpgCameraGetMat(camera));
-					crpgCubeSetCamera(cubes[1], crpgCameraGetMat(camera));
-					break;
-				case SDLK_s:
-					crpgCameraPan(camera, vec3(0,0,1));
-					crpgCubeSetCamera(cubes[0], crpgCameraGetMat(camera));
-					crpgCubeSetCamera(cubes[1], crpgCameraGetMat(camera));
-					break;
-				case SDLK_d:
-					crpgCameraPan(camera, vec3(1,0,0));
-					crpgCubeSetCamera(cubes[0], crpgCameraGetMat(camera));
-					crpgCubeSetCamera(cubes[1], crpgCameraGetMat(camera));
-					break;
-				case SDLK_a:
-					crpgCameraPan(camera, vec3(-1,0,0));
-					crpgCubeSetCamera(cubes[0], crpgCameraGetMat(camera));
-					crpgCubeSetCamera(cubes[1], crpgCameraGetMat(camera));
-					break;
-			}
-		}
 	}
+	crpgInputUpdate();
 
 	// Updating physics as many times as we need to consume dt
-	while(crpgTimeStepPhysRequried(physUpdates)){
-		crpgCameraUpdate(camera, crpgTimeStepDelta());
-
+	while(crpgTimeStepPhysRequired(physUpdates)){
+		crpgCameraUpdate(camera);
+		crpgCubeSetCamera(cubes[0], crpgCameraGetMat(camera));
+		crpgCubeSetCamera(cubes[1], crpgCameraGetMat(camera));
 		physUpdates++;
 	}
 }
 
 static void render()
 {
+	crpgCameraRender(camera, crpgTimeStepDelta());
+
 	glClearColor(0.2, 0.3, 0.3, 1.0);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -243,6 +217,7 @@ int main()
 	}
 
 	SDL_Quit();
+	crpgInputCleanup();
 	crpgCubeFree(cubes[0]);
 	crpgCubeFree(cubes[1]);
 	return 0;

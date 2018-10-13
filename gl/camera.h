@@ -10,5 +10,6 @@ void crpgCameraPan(crpgCamera *c, vec3_t panAxis);
 void crpgCameraSetAR(float ar);
 mat4_t *crpgCameraGetMat(crpgCamera *c);
 void crpgCameraSetSpeed(crpgCamera *c, float speedPerSecond);
-void crpgCameraUpdate(crpgCamera *c, float dtms);
+void crpgCameraRender(crpgCamera *c, float dtms);
+void crpgCameraUpdate(crpgCamera *c);
 #endif//CAMERA_H
