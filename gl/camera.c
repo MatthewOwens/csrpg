@@ -1,50 +1,98 @@
-#include "camera.h"
-#include <math.h>
 #include <stdlib.h>
+#include <math.h>
+#include "camera.h"
 #include "input.h"
 
-static vec3_t worldSpaceVec;
-static float aspectRatio = 16.f/9.f;	// sane default for the aspect ratio
+static const float YAW			= -90.f;
+static const float PITCH		= 0.0f;
+static const float SPEED		= 2.5f;
+static const float SENSITIVITY	= 0.1f;
+static const float ZOOM			= 45.0f;
 
 typedef struct
 {
-	vec3_t from, to, up;
-	mat4_t camera, perspective, worldToScreen;
-	float speed;
+	vec3_t position;
+	vec3_t front;
+	vec3_t up;
+	vec3_t right;
+	vec3_t worldUp;
 
-	// Axis' to manouver across. If 0, no movement is occuring
-	vec3_t pan, yaw, roll;
-} Camera_t;
+	/* euler angles */
+	float yaw;
+	float pitch;
 
-///TODO: figure out why this is failing
-mat4_t recalcPerspective(float hFovDeg, float near, float far)
+	/* camera options */
+	float movementSpeed;
+	float mouseSensitivity;
+	float zoom;
+	float aspectRatio;
+	float near;
+	float far;
+
+	/* storing the final matrix to prevent multiple calculations/frame */
+	mat4_t matrix;
+} crpgCamera_t;
+
+double toRadians(double degrees)
 {
-	float vFovDeg = 2 * atan( tan(hFovDeg/2) * aspectRatio );
-	float vFovRad = vFovDeg * (M_PI/180.f);
-
-	return m4_perspective(vFovRad, aspectRatio, near, far);
+	return degrees * (M_PI / 180.f);
 }
 
-void crpgCameraSetAR(float ar)
+double toDegrees(double radians)
 {
-	aspectRatio = ar;
+	return radians * (180.f / M_PI);
 }
 
-crpgCamera *crpgCameraNew(vec3_t from, vec3_t to, vec3_t up)
+void updateMatrix(crpgCamera_t *ct)
 {
-	// ensuring that the world doesn't go mental
-	worldSpaceVec = vec3(1, 1, -1);
-	Camera_t *ct = malloc(sizeof(Camera_t));
-	ct->from = from;
-	ct->to = to;
+	vec3_t to = v3_add(ct->position, ct->front);
+
+	mat4_t lookat = m4_look_at(ct->position, to, ct->up);
+	mat4_t perspective = m4_perspective(60, ct->aspectRatio, ct->near, ct->far);
+	ct->matrix = m4_mul(perspective, lookat);
+}
+
+void updateVectors(crpgCamera_t *ct)
+{
+	/* calculate the new front vector */
+	ct->front.x = cos(toRadians(ct->yaw)) * cos(toRadians(ct->pitch));
+	ct->front.y = sin(toRadians(ct->pitch));
+	ct->front.z = sin(toRadians(ct->yaw)) * cos(toRadians(ct->pitch));
+	ct->front = v3_norm(ct->front);
+
+	/* calculating the new right and up vectors */
+	ct->right = v3_norm(v3_cross(ct->position, ct->worldUp));
+	ct->up = v3_norm(v3_cross(ct->right, ct->front));
+}
+
+mat4_t *crpgCameraGetMat(crpgCamera *c)
+{
+	crpgCamera_t *ct = (crpgCamera_t *)c;
+	updateMatrix(ct);
+	return &(ct->matrix);
+}
+
+crpgCamera *crpgCameraNew(vec3_t position, vec3_t up)
+{
+	crpgCamera_t *ct = malloc(sizeof(crpgCamera_t));
+	ct->position = position;
 	ct->up = up;
-	ct->camera = m4_look_at(from, to, up);
-	//ct->perspective = recalcPerspective(90.f, 1, 10);
-	ct->perspective = m4_perspective(60, aspectRatio, 1, 10);
-	ct->worldToScreen = m4_mul(ct->perspective, ct->camera);
-	ct->speed = 1.0f;
+	ct->worldUp = vec3(0,1,0);
 
-	crpgCamera *c = (crpgCamera *) ct;
+	/* using some sane defaults */
+	ct->front = vec3(0.0f, 0.0f, -1.0f);
+	ct->yaw = YAW;
+	ct->pitch = PITCH;
+	ct->zoom = ZOOM;
+	ct->movementSpeed = SPEED;
+	ct->mouseSensitivity = SENSITIVITY;
+	ct->aspectRatio = 16.f/9.f;
+	ct->near = 1.f;
+	ct->far = 10.f;
+
+	updateVectors(ct);
+
+	crpgCamera *c = (crpgCamera *)ct;
 	return c;
 }
 
@@ -57,74 +105,39 @@ void crpgCameraFree(crpgCamera *c)
 	}
 }
 
-void crpgCameraSetSpeed(crpgCamera *c, float speedPerSecond)
+void crpgCameraSetZoom(crpgCamera *c, float zoom)
 {
-	if(c == NULL) return;
-
-	Camera_t *ct = (Camera_t *) c;
-	ct->speed = speedPerSecond;
+	crpgCamera_t *ct = (crpgCamera_t *)c;
+	ct->zoom = zoom;
 }
 
-// This function expects a vec3_t formatted with values of 1, 0 or -1.
-// to represent if the axis should be panned across and the direction
-void crpgCameraPan(crpgCamera *c, vec3_t panAxis)
+void crpgCameraSetSpeed(crpgCamera *c, float speed)
 {
-	if(c == NULL)
-		return;
-
-	Camera_t *ct = (Camera_t *) c;
-	ct->pan = panAxis;
-
+	crpgCamera_t *ct = (crpgCamera_t *)c;
+	ct->movementSpeed = speed;
 }
 
-mat4_t *crpgCameraGetMat(crpgCamera *c)
+void crpgCameraSetSensitivity(crpgCamera *c, float sensitivity)
 {
-	Camera_t *ct = (Camera_t *)c;
-	return &(ct->worldToScreen);
-}
-
-// expecting components as {from, to, up}
-void updatePan(vec3_t panAxis, vec3_t *components[3], float speed, float dtms)
-{
-	int axis[] = { panAxis.x, panAxis.y, panAxis.z };
-	float* fromArr[] = { &components[0]->x, &components[0]->y, &components[0]->z };
-	float* toArr[] = { &components[1]->x, &components[1]->y, &components[1]->z };
-
-	for(int i = 0; i < 3; ++i){
-		if(axis[i] != 0){	// if we should pan on this axis
-			int sign = 0;
-			sign = (axis[i] > 0) ? 1 : -1;
-			*fromArr[i] += sign * (speed/1000.f);
-			*toArr[i] += sign * (speed/1000.f);
-		}
-	}
-}
-
-void crpgCameraUpdate(crpgCamera *c)
-{
-	vec3_t panAxis = (vec3_t){0.f,0.f,0.f};
-
-	panAxis.x = crpgInputHeld(INPUT_CAMERA_PAN_RIGHT) ? 1 : 0;
-	panAxis.x = crpgInputHeld(INPUT_CAMERA_PAN_LEFT) ? -1 : panAxis.x;
-
-	panAxis.y = crpgInputHeld(INPUT_CAMERA_PAN_UP) ? 1 : 0;
-	panAxis.y = crpgInputHeld(INPUT_CAMERA_PAN_DOWN) ? -1 : panAxis.y;
-
-	panAxis.z = crpgInputHeld(INPUT_CAMERA_PAN_IN) ? 1 : 0;
-	panAxis.z = crpgInputHeld(INPUT_CAMERA_PAN_OUT) ? -1 : panAxis.z;
-
-	Camera_t *ct = (Camera_t *)c;
-	ct->pan = panAxis;
+	crpgCamera_t *ct = (crpgCamera_t *)c;
+	ct->mouseSensitivity = sensitivity;
 }
 
 void crpgCameraRender(crpgCamera *c, float dtms)
 {
-	Camera_t *ct = (Camera_t *)c;
-	vec3_t *components[] = { &(ct->from), &(ct->to), &(ct->up) };
+}
 
-	updatePan(ct->pan, components, ct->speed, dtms);
+void crpgCameraUpdate(crpgCamera *c, float dtms)
+{
+	/*
+	crpgCamera_t *ct = (crpgCamera_t *)c;
+	float velocity = ct->movementSpeed * dtms;
 
-	// recalc camera matrices
-	ct->camera = m4_look_at(ct->from, ct->to, ct->up);
-	ct->worldToScreen = m4_mul(ct->perspective, ct->camera);
+	if(crpgInputHeld(INPUT_CAMERA_PAN_IN)){
+		ct->position = v3_add(ct->position, v3_muls(ct->front, velocity));
+	}
+	if(crpgInputHeld(INPUT_CAMERA_PAN_OUT)){
+		ct->position = v3_sub(ct->position, v3_muls(ct->front, velocity));
+	}
+	*/
 }
