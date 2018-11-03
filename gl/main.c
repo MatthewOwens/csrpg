@@ -100,9 +100,9 @@ static void initShapes()
 
 static void initView()
 {
-	crpgCameraSetAR((float)screen_width/(float)screen_height);
-	camera = crpgCameraNew(vec3(0,0,4), vec3(0,0,0), vec3(0,1,0));
+	camera = crpgCameraNew(vec3(0,0,3), vec3(0,1,0));
 	crpgCameraSetSpeed(camera, 20);
+
 	crpgCubeSetCamera(cubes[0], crpgCameraGetMat(camera));
 	crpgCubeSetCamera(cubes[1], crpgCameraGetMat(camera));
 
@@ -165,7 +165,7 @@ static void update()
 
 	// Updating physics as many times as we need to consume dt
 	while(crpgTimeStepPhysRequired(physUpdates)){
-		crpgCameraUpdate(camera);
+		crpgCameraUpdate(camera, crpgTimeStepDelta());
 		crpgCubeSetCamera(cubes[0], crpgCameraGetMat(camera));
 		crpgCubeSetCamera(cubes[1], crpgCameraGetMat(camera));
 		physUpdates++;
