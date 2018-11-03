@@ -3,8 +3,8 @@
 #include <SDL2/SDL.h>
 
 typedef struct KeyboardDevice{
-	Uint8 *state;
-	Uint8 *prevState;
+	Uint8 state[SDL_NUM_SCANCODES];
+	Uint8 prevState[SDL_NUM_SCANCODES];
 	Uint8 *binds;
 }KeyboardDevice;
 
@@ -19,7 +19,7 @@ typedef struct MouseDevice{
 	MouseState prevState;
 }MouseDevice;
 
-static KeyboardDevice kb = {NULL,NULL,NULL};
+static KeyboardDevice kb;// = {NULL,NULL,NULL};
 static MouseDevice m;	//Setting buttonCount to 5, as SDL supports 5 mouse buttons
 
 bool devicesNotInitilised()
@@ -61,7 +61,6 @@ bool crpgInputPressed(int action)
 	if(devicesNotInitilised()){
 		return false;
 	}
-	printf("binds is: %d, SDL is %d\n", kb.binds[action], SDL_SCANCODE_D);
 	printf("current state: %d, prev state: %d\n\n", kb.state[kb.binds[action]], kb.prevState[kb.binds[action]]);
 	return (kb.state[ kb.binds[action] ] && !kb.prevState[ kb.binds[action] ]);
 }
@@ -89,6 +88,10 @@ void crpgInputInit()
 {
 	kb.binds = malloc(sizeof(Uint8) * INPUT_LAST);
 	loadKeybinds();
+
+	// Init the last frame array to 0
+	memset(kb.prevState, 0, sizeof(Uint8)*SDL_NUM_SCANCODES);
+	memcpy(kb.state, SDL_GetKeyboardState(NULL), sizeof(Uint8)*SDL_NUM_SCANCODES);
 }
 
 void crpgInputCleanup()
@@ -98,12 +101,13 @@ void crpgInputCleanup()
 
 void crpgInputUpdate()
 {
-	//SDL_PumpEvents();
-	kb.prevState = kb.state;
-	kb.state = SDL_GetKeyboardState(NULL);
+	//kb.prevState = kb.state;
+	//kb.state = *(SDL_GetKeyboardState(NULL));
+
+	memcpy(kb.prevState, kb.state, sizeof(Uint8)*SDL_NUM_SCANCODES);
+	memcpy(kb.state, SDL_GetKeyboardState(NULL), sizeof(Uint8)*SDL_NUM_SCANCODES);
 
 	m.prevState = m.state;
-	//m.state.buttons = SDL_GetRelativeMouseState(&(m.state.x), &(m.state.y));
 	m.state.buttons = SDL_GetMouseState(&(m.state.x), &(m.state.y));
 	SDL_GetRelativeMouseState(&(m.state.relX), &(m.state.relY));
 }
