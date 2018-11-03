@@ -8,8 +8,6 @@ uniform mat4 camera;
 
 void main()
 {
-	//gl_Position = transform * vec4(aPos, 1.0);
 	gl_Position = camera * transform * vec4(aPos, 1.0);
-	//gl_Position = camera * vec4(aPos, 1.0);
 	vTex = aTex;
 }
