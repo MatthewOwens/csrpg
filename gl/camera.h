@@ -11,6 +11,5 @@ void crpgCameraSetZoom(crpgCamera *c, float zoom);
 void crpgCameraSetSpeed(crpgCamera *c, float speed);
 void crpgCameraSetSensitivity(crpgCamera *c, float sensitivity);
 
-void crpgCameraRender(crpgCamera *c, float dtms);
 void crpgCameraUpdate(crpgCamera *c, float dtms);
 #endif//CAMERA_H

@@ -5,7 +5,7 @@
 
 static const float YAW			= -90.f;
 static const float PITCH		= 0.0f;
-static const float SPEED		= 2.5f;
+static const float SPEED		= 0.2f;
 static const float SENSITIVITY	= 0.1f;
 static const float ZOOM			= 45.0f;
 
@@ -88,7 +88,7 @@ crpgCamera *crpgCameraNew(vec3_t position, vec3_t up)
 	ct->mouseSensitivity = SENSITIVITY;
 	ct->aspectRatio = 16.f/9.f;
 	ct->near = 1.f;
-	ct->far = 10.f;
+	ct->far = 30.f;
 
 	updateVectors(ct);
 
@@ -123,21 +123,42 @@ void crpgCameraSetSensitivity(crpgCamera *c, float sensitivity)
 	ct->mouseSensitivity = sensitivity;
 }
 
-void crpgCameraRender(crpgCamera *c, float dtms)
-{
-}
-
 void crpgCameraUpdate(crpgCamera *c, float dtms)
 {
-	/*
 	crpgCamera_t *ct = (crpgCamera_t *)c;
 	float velocity = ct->movementSpeed * dtms;
 
+	/* updating the pan values */
 	if(crpgInputHeld(INPUT_CAMERA_PAN_IN)){
 		ct->position = v3_add(ct->position, v3_muls(ct->front, velocity));
 	}
 	if(crpgInputHeld(INPUT_CAMERA_PAN_OUT)){
 		ct->position = v3_sub(ct->position, v3_muls(ct->front, velocity));
 	}
-	*/
+	if(crpgInputHeld(INPUT_CAMERA_PAN_RIGHT)){
+		ct->position = v3_add(ct->position, v3_muls(ct->right, velocity));
+	}
+	if(crpgInputHeld(INPUT_CAMERA_PAN_LEFT)){
+		ct->position = v3_sub(ct->position, v3_muls(ct->right, velocity));
+	}
+	if(crpgInputHeld(INPUT_CAMERA_PAN_UP)){
+		ct->position = v3_add(ct->position, v3_muls(ct->up, velocity));
+	}
+	if(crpgInputHeld(INPUT_CAMERA_PAN_DOWN)){
+		ct->position = v3_sub(ct->position, v3_muls(ct->up, velocity));
+	}
+
+	/* processing mouse movement */
+	vec2_t mouseOffset = crpgInputMouseRelPos();
+	mouseOffset.x *= ct->mouseSensitivity;
+	mouseOffset.y *= ct->mouseSensitivity;
+
+	ct->yaw += mouseOffset.x;
+	ct->pitch += mouseOffset.y;
+
+	// preventing the screen from flipping
+	ct->pitch > 89.0f ? 89.0f : ct->pitch;
+	ct->pitch < -89.0f ? -89.0f : ct->pitch;
+
+	updateVectors(ct);
 }
