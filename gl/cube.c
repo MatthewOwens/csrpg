@@ -98,6 +98,9 @@ void initShader(Cube_t *ct)
 
 void crpgCubeSetCamera(crpgCube *c, mat4_t *cam)
 {
+	if(cam == NULL){
+		err_output("Camera is NULL!");
+	}
 	Cube_t *ct = (Cube_t *) c;
 	crpgShaderUse(shader);
 	unsigned int loc = glGetUniformLocation(crpgShaderID(shader), "camera");
@@ -105,7 +108,7 @@ void crpgCubeSetCamera(crpgCube *c, mat4_t *cam)
 	crpgShaderUse(0);
 }
 
-static bool printed = false;
+static int printed = 0;
 void crpgCubeRender(crpgCube *c)
 {
 	crpgShaderUse(shader);
@@ -116,10 +119,10 @@ void crpgCubeRender(crpgCube *c)
 	ct->transform = m4_mul(ct->transform, ct->rotation);
 	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, &ct->transform);
 	
-	if(!printed){
+	if(printed < 2){
 		printf("cube transform\n");
 		m4_print(ct->transform);
-		printed = true;
+		printed++;
 	}
 
 	glActiveTexture(GL_TEXTURE0);
