@@ -19,7 +19,7 @@ typedef struct MouseDevice{
 	MouseState prevState;
 }MouseDevice;
 
-static KeyboardDevice kb;// = {NULL,NULL,NULL};
+static KeyboardDevice kb;
 static MouseDevice m;	//Setting buttonCount to 5, as SDL supports 5 mouse buttons
 
 bool devicesNotInitilised()
@@ -42,8 +42,8 @@ void loadKeybinds()
 	kb.binds[INPUT_CAMERA_PAN_DOWN] = SDL_SCANCODE_E;
 	kb.binds[INPUT_CAMERA_PAN_LEFT] = SDL_SCANCODE_A;
 	kb.binds[INPUT_CAMERA_PAN_RIGHT] = SDL_SCANCODE_D;
-	kb.binds[INPUT_CAMERA_PAN_IN] = SDL_SCANCODE_S;
-	kb.binds[INPUT_CAMERA_PAN_OUT] = SDL_SCANCODE_W;
+	kb.binds[INPUT_CAMERA_PAN_IN] = SDL_SCANCODE_W;
+	kb.binds[INPUT_CAMERA_PAN_OUT] = SDL_SCANCODE_S;
 }
 
 vec2_t crpgInputMousePos()
@@ -61,7 +61,6 @@ bool crpgInputPressed(int action)
 	if(devicesNotInitilised()){
 		return false;
 	}
-	printf("current state: %d, prev state: %d\n\n", kb.state[kb.binds[action]], kb.prevState[kb.binds[action]]);
 	return (kb.state[ kb.binds[action] ] && !kb.prevState[ kb.binds[action] ]);
 }
 
@@ -101,9 +100,6 @@ void crpgInputCleanup()
 
 void crpgInputUpdate()
 {
-	//kb.prevState = kb.state;
-	//kb.state = *(SDL_GetKeyboardState(NULL));
-
 	memcpy(kb.prevState, kb.state, sizeof(Uint8)*SDL_NUM_SCANCODES);
 	memcpy(kb.state, SDL_GetKeyboardState(NULL), sizeof(Uint8)*SDL_NUM_SCANCODES);
 
