@@ -2,13 +2,25 @@
 #include "err.h"
 #include <SDL2/SDL.h>
 
-typedef struct InputDevice{
+typedef struct KeyboardDevice{
 	Uint8 *state;
 	Uint8 *prevState;
 	Uint8 *binds;
-}InputDevice;
+}KeyboardDevice;
 
-static InputDevice kb = {NULL,NULL,NULL};
+typedef struct MouseState{
+	Uint8 buttons;
+	int x, y;
+	int relX, relY;		// the xy coords relative to the last frame
+}MouseState;
+
+typedef struct MouseDevice{
+	MouseState state;
+	MouseState prevState;
+}MouseDevice;
+
+static KeyboardDevice kb = {NULL,NULL,NULL};
+static MouseDevice m;	//Setting buttonCount to 5, as SDL supports 5 mouse buttons
 
 bool devicesNotInitilised()
 {
@@ -32,6 +44,16 @@ void loadKeybinds()
 	kb.binds[INPUT_CAMERA_PAN_RIGHT] = SDL_SCANCODE_D;
 	kb.binds[INPUT_CAMERA_PAN_IN] = SDL_SCANCODE_S;
 	kb.binds[INPUT_CAMERA_PAN_OUT] = SDL_SCANCODE_W;
+}
+
+vec2_t crpgInputMousePos()
+{
+	return vec2(m.state.x, m.state.y);
+}
+
+vec2_t crpgInputMouseRelPos()
+{
+	return vec2(m.state.relX, m.state.relY);
 }
 
 bool crpgInputPressed(int action)
@@ -79,4 +101,9 @@ void crpgInputUpdate()
 	//SDL_PumpEvents();
 	kb.prevState = kb.state;
 	kb.state = SDL_GetKeyboardState(NULL);
+
+	m.prevState = m.state;
+	//m.state.buttons = SDL_GetRelativeMouseState(&(m.state.x), &(m.state.y));
+	m.state.buttons = SDL_GetMouseState(&(m.state.x), &(m.state.y));
+	SDL_GetRelativeMouseState(&(m.state.relX), &(m.state.relY));
 }
