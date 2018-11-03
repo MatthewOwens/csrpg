@@ -96,6 +96,9 @@ v1.0  2016-02-15  Initial release
 // So you can just upload the vectors into shaders as they are.
 //
 
+typedef struct { float x, y; } vec2_t;
+static inline vec2_t vec2(float x, float y)					{ return (vec2_t){ x, y }; }
+
 typedef struct { float x, y, z; } vec3_t;
 static inline vec3_t vec3(float x, float y, float z)        { return (vec3_t){ x, y, z }; }
 
