@@ -119,7 +119,8 @@ static bool init()
 	}
 
 	window = SDL_CreateWindow("csrpg - opengl", SDL_WINDOWPOS_CENTERED,
-			 SDL_WINDOWPOS_CENTERED, screen_width, screen_height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+			 SDL_WINDOWPOS_CENTERED, screen_width, screen_height,
+			 SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_INPUT_FOCUS);
 
 	if (window == NULL){
 		printf("SDL couldn't make an OpenGL window! SDL_Error: %s\n", SDL_GetError());
@@ -160,7 +161,7 @@ static void update()
 			quit = true;
 		}
 	}
-	crpgInputUpdate();
+	crpgInputUpdate(SDL_GetWindowFlags(window));
 
 	// Updating physics as many times as we need to consume dt
 	while(crpgTimeStepPhysRequired(physUpdates)){

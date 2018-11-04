@@ -1,6 +1,5 @@
 #include "input.h"
 #include "err.h"
-#include <SDL2/SDL.h>
 
 typedef struct KeyboardDevice{
 	Uint8 state[SDL_NUM_SCANCODES];
@@ -93,7 +92,7 @@ void crpgInputInit()
 
 	// constraining the mouse to the window
 	// TODO: only set relative mouse mode once the mouse is in the window, disable input otherwise
-	SDL_SetRelativeMouseMode(SDL_TRUE);
+	//SDL_SetRelativeMouseMode(SDL_TRUE);
 }
 
 void crpgInputCleanup()
@@ -101,12 +100,25 @@ void crpgInputCleanup()
 	free(kb.binds);
 }
 
-void crpgInputUpdate()
+void crpgInputUpdate(Uint32 windowFlags)
 {
-	memcpy(kb.prevState, kb.state, sizeof(Uint8)*SDL_NUM_SCANCODES);
-	memcpy(kb.state, SDL_GetKeyboardState(NULL), sizeof(Uint8)*SDL_NUM_SCANCODES);
+	bool windowShown = (windowFlags & SDL_WINDOW_SHOWN) ? true : false;
+	bool windowMinimized = (windowFlags & SDL_WINDOW_MINIMIZED) ? true : false;
+	bool windowInputFocus = (windowFlags & SDL_WINDOW_INPUT_FOCUS) ? true : false;
 
-	m.prevState = m.state;
-	m.state.buttons = SDL_GetMouseState(&(m.state.x), &(m.state.y));
-	SDL_GetRelativeMouseState(&(m.state.relX), &(m.state.relY));
+	if(!windowShown || windowMinimized)
+		return;
+
+	if(windowInputFocus){
+		memcpy(kb.prevState, kb.state, sizeof(Uint8)*SDL_NUM_SCANCODES);
+		memcpy(kb.state, SDL_GetKeyboardState(NULL), sizeof(Uint8)*SDL_NUM_SCANCODES);
+
+		m.prevState = m.state;
+
+		SDL_SetRelativeMouseMode(SDL_TRUE);
+		m.state.buttons = SDL_GetMouseState(&(m.state.x), &(m.state.y));
+		SDL_GetRelativeMouseState(&(m.state.relX), &(m.state.relY));
+	} else {
+		SDL_SetRelativeMouseMode(SDL_FALSE);
+	}
 }

@@ -2,6 +2,7 @@
 #define INPUT_H
 #include <stdbool.h>
 #include "math_3d.h"
+#include <SDL2/SDL.h>
 
 typedef enum crpgInputActions{
 	INPUT_CAMERA_PAN_DOWN = 0,
@@ -14,7 +15,7 @@ typedef enum crpgInputActions{
 }crpgInputActions;
 
 void crpgInputInit();
-void crpgInputUpdate();
+void crpgInputUpdate(Uint32 windowFlags);
 void crpgInputCleanup();
 
 bool crpgInputPressed(int action);
