@@ -89,10 +89,6 @@ void crpgInputInit()
 
 	memset(kb.prevState, 0, sizeof(Uint8)*SDL_NUM_SCANCODES);
 	memcpy(kb.state, SDL_GetKeyboardState(NULL), sizeof(Uint8)*SDL_NUM_SCANCODES);
-
-	// constraining the mouse to the window
-	// TODO: only set relative mouse mode once the mouse is in the window, disable input otherwise
-	//SDL_SetRelativeMouseMode(SDL_TRUE);
 }
 
 void crpgInputCleanup()
