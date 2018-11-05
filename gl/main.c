@@ -17,8 +17,8 @@
 
 static SDL_Window *window = NULL;
 static SDL_GLContext *context = NULL;
-static int screen_width = 1280;
-static int screen_height = 720;
+static int screen_width = 1920;
+static int screen_height = 1080;
 static bool quit = false;
 //static Uint32 ltime, ctime, numframes, cftime, lftime;
 
@@ -120,7 +120,8 @@ static bool init()
 
 	window = SDL_CreateWindow("csrpg - opengl", SDL_WINDOWPOS_CENTERED,
 			 SDL_WINDOWPOS_CENTERED, screen_width, screen_height,
-			 SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_INPUT_FOCUS);
+			 SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE | SDL_WINDOW_INPUT_FOCUS |
+			 SDL_WINDOW_BORDERLESS);
 
 	if (window == NULL){
 		printf("SDL couldn't make an OpenGL window! SDL_Error: %s\n", SDL_GetError());
@@ -218,5 +219,6 @@ int main()
 	crpgInputCleanup();
 	crpgCubeFree(cubes[0]);
 	crpgCubeFree(cubes[1]);
+	printf("\n");
 	return 0;
 }

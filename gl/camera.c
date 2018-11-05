@@ -48,6 +48,7 @@ void updateMatrix(crpgCamera_t *ct)
 	vec3_t to = v3_add(ct->position, ct->front);
 
 	mat4_t lookat = m4_look_at(ct->position, to, ct->up);
+	/* TODO: change first param to calcualated value */
 	mat4_t perspective = m4_perspective(60, ct->aspectRatio, ct->near, ct->far);
 	ct->matrix = m4_mul(perspective, lookat);
 }
@@ -61,7 +62,7 @@ void updateVectors(crpgCamera_t *ct)
 	ct->front = v3_norm(ct->front);
 
 	/* calculating the new right and up vectors */
-	ct->right = v3_norm(v3_cross(ct->position, ct->worldUp));
+	ct->right = v3_norm(v3_cross(ct->front, ct->worldUp));
 	ct->up = v3_norm(v3_cross(ct->right, ct->front));
 }
 
@@ -142,10 +143,10 @@ void crpgCameraUpdate(crpgCamera *c, float dtms)
 		ct->position = v3_sub(ct->position, v3_muls(ct->right, velocity));
 	}
 	if(crpgInputHeld(INPUT_CAMERA_PAN_UP)){
-		ct->position = v3_add(ct->position, v3_muls(ct->up, velocity));
+		ct->position = v3_add(ct->position, v3_muls(ct->worldUp, velocity));
 	}
 	if(crpgInputHeld(INPUT_CAMERA_PAN_DOWN)){
-		ct->position = v3_sub(ct->position, v3_muls(ct->up, velocity));
+		ct->position = v3_sub(ct->position, v3_muls(ct->worldUp, velocity));
 	}
 
 	/* processing mouse movement */
@@ -154,11 +155,22 @@ void crpgCameraUpdate(crpgCamera *c, float dtms)
 	mouseOffset.y *= ct->mouseSensitivity;
 
 	ct->yaw += mouseOffset.x;
-	ct->pitch += mouseOffset.y;
+	ct->pitch -= mouseOffset.y;
 
-	// preventing the screen from flipping
-	ct->pitch > 89.0f ? 89.0f : ct->pitch;
-	ct->pitch < -89.0f ? -89.0f : ct->pitch;
+	/* preventing the screen from flipping */
+	ct->pitch = (ct->pitch > 89.0f) ? 89.0f : ct->pitch;
+	ct->pitch = (ct->pitch < -89.0f) ? -89.0f : ct->pitch;
+
+	/* constricting the yaw */
+	ct->yaw = (ct->yaw < 0.f) ? 360.f : ct->yaw;
+	ct->yaw = (ct->yaw > 360.f) ? 0.f : ct->yaw;
+
+	printf("ct->pitch: %f\tct->yaw: %f\tpos: (%f,%f,%f)\r",
+			ct->pitch, ct->yaw, ct->position.x, ct->position.y, ct->position.z);
 
 	updateVectors(ct);
+}
+
+void crpgCameraRender(crpgCamera *c)
+{
 }
