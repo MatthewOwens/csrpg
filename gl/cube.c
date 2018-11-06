@@ -115,8 +115,8 @@ void crpgCubeRender(crpgCube *c)
 
 	Cube_t *ct = (Cube_t *)c;
 	ct->transform = ct->translation;
-	ct->transform = m4_mul(ct->transform, ct->scale);
 	ct->transform = m4_mul(ct->transform, ct->rotation);
+	ct->transform = m4_mul(ct->transform, ct->scale);
 	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, &ct->transform);
 	
 	if(printed < 2){

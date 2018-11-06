@@ -90,7 +90,7 @@ static void initShapes()
 	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, &transform);
 
 	cubes[0] = crpgCubeNew();
-	crpgCubeScale(cubes[0], vec3(1.5f, 1.f, 1.f));
+	crpgCubeScale(cubes[0], vec3(1.0f, 1.f, 1.f));
 	crpgCubePosition(cubes[0], vec3(1.0, 0.f, 0.f));
 	crpgCubeRotation(cubes[0], 0.785f, vec3(0,1,0));
 
