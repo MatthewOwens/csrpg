@@ -3,9 +3,12 @@
 #include <ncurses.h>
 #include "board.h"
 
-void boardRenderer_init();
-void boardRenderer_render();
-void boardRenderer_cleanup();
-void boardRenderer_set_board(Board *board);
+void brndr_init();
+void brndr_render();
+void brndr_cleanup();
+void brndr_set_board(Board *board);
+void brndr_set_rendered_layer(int l);
+int brndr_get_rendered_layer();
+void brndr_move_draw_pos(Point2i p);
 
 #endif//BOARD_RENDERER_H

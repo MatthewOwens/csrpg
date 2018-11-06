@@ -3,3 +3,4 @@ game
 game-nogl
 *.o
 *.sw*
+*.trace
