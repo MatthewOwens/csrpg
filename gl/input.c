@@ -37,8 +37,8 @@ void loadKeybinds()
 	}
 
 	//TODO: change from static keybinds to keybinds loaded from a file
-	kb.binds[INPUT_CAMERA_PAN_UP] = SDL_SCANCODE_Q;
-	kb.binds[INPUT_CAMERA_PAN_DOWN] = SDL_SCANCODE_E;
+	kb.binds[INPUT_CAMERA_PAN_UP] = SDL_SCANCODE_SPACE;
+	kb.binds[INPUT_CAMERA_PAN_DOWN] = SDL_SCANCODE_LSHIFT;
 	kb.binds[INPUT_CAMERA_PAN_LEFT] = SDL_SCANCODE_A;
 	kb.binds[INPUT_CAMERA_PAN_RIGHT] = SDL_SCANCODE_D;
 	kb.binds[INPUT_CAMERA_PAN_IN] = SDL_SCANCODE_W;
