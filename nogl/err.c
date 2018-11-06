@@ -8,8 +8,8 @@ static char* lpath = NULL;
 
 #define ERR_X 0
 #define ERR_Y 0
-#define ERR_W 80
-#define ERR_H 3
+#define ERR_WIDTH 80
+#define ERR_HEIGHT 3
 
 void err_output(const char *message)
 {
@@ -17,7 +17,7 @@ void err_output(const char *message)
 		fprintf(stderr, message);
 	} else {
 		err_clear();
-		win = newwin(ERR_H, ERR_W, ERR_Y, ERR_X);
+		win = newwin(ERR_HEIGHT, ERR_WIDTH, ERR_Y, ERR_X);
 		wborder(win, '|', '|', '-', '-', '+', '+', '+', '+');
 		mvwprintw(win, 1, 2, message);
 		wrefresh(win);
